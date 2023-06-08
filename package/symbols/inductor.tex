@@ -1,0 +1,88 @@
+\tikzset{
+    circuits/inductor/width/.initial = 0.8cm,
+    circuits/inductor/height/.initial = 0.266667cm,
+    circuits/inductor/segments/.initial = 3,
+    circuits/inductor/terminal extension/.initial = 0.05cm,
+    inductor/.style = {americaninductorshape}
+}
+
+\pgfdeclareshape{americaninductorshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/inductor/width}}
+    \saveddimen{\height}{\pgf@x=\pgfkeysifdefined{/tikz/circuits/inductor/height}{\pgfkeysvalueof{/tikz/circuits/inductor/height}}{\pgfkeysvalueof{/tikz/circuits/inductor/width}}}
+    \saveddimen{\extension}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/inductor/terminal extension}}
+    \savedmacro{\segments}{\renewcommand{\segments}[0]{\pgfkeysvalueof{/tikz/circuits/inductor/segments}}}
+    \savedanchor{\leftpoint}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \pgfkeysvalueof{/tikz/circuits/inductor/width}- \pgfkeysvalueof{/tikz/circuits/inductor/terminal extension}}{0cm}}
+    }
+    \savedanchor{\rightpoint}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \pgfkeysvalueof{/tikz/circuits/inductor/width} + \pgfkeysvalueof{/tikz/circuits/inductor/terminal extension}}{0cm}}
+    }
+
+    % electrical terminals
+    \anchor{plus}{\leftpoint}
+    \anchor{minus}{\rightpoint}
+    % general anchors
+    \anchor{center}{\pgfpointorigin}
+    \anchor{west}{\leftpoint}
+    \anchor{inner west}{
+        \pgfpointadd{\pgfpointorigin}{
+            \pgfpoint
+            {-0.5 * \width}
+            {0cm}
+        }
+    }
+    \anchor{east}{\rightpoint}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{0.5 * \height}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-0.5 * \height}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \height}{-0.5 * \width}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \height}{-0.5 * \width}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \height}{0.5 * \width}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \height}{0.5 * \width}}}
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathmoveto{\leftpoint}
+        \pgfpathlineto{\pgfpointadd{\leftpoint}{\pgfpoint{\extension}{0cm}}}
+        \foreach \x in {1,...,\segments}
+        {
+            \pgfpatharc{180}{0}{\width / \segments / 2 and \height/2}
+        }
+        \pgfpathlineto{\pgfpointadd{\rightpoint}{\pgfpoint{-\extension}{0cm}}}
+        \pgfpathlineto{\rightpoint}
+        \pgfusepath{stroke}
+    }
+}
+\pgfdeclareshape{europeeninductorshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/inductor/width}}
+    \saveddimen{\height}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/inductor/height}}
+    \savedanchor{\lowerleft}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \pgfkeysvalueof{/tikz/circuits/inductor/width}}{-0.5 * \pgfkeysvalueof{/tikz/circuits/inductor/height}}}
+    }
+    \savedanchor{\upperright}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \pgfkeysvalueof{/tikz/circuits/inductor/width}}{0.5 * \pgfkeysvalueof{/tikz/circuits/inductor/height}}}
+    }
+
+    % electrical terminals
+    \anchor{plus}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{0cm}}}
+    \anchor{minus}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{0cm}}}
+    % general anchors
+    \anchor{lowerleft}{\lowerleft}
+    \anchor{upperright}{\upperright}
+    \anchor{center}{\pgfpointorigin}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{0cm}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{0cm}}}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{0.5 * \height}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-0.5 * \height}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{-0.5 * \height}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{0.5 * \height}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{0.5 * \height}}}
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathrectanglecorners{\lowerleft}{\upperright}
+        \pgfusepath{fill}
+    }
+}
+
+% vim: ft=plaintex

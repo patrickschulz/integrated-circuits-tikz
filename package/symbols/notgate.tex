@@ -1,0 +1,45 @@
+\tikzset{
+    notgate/.style = {notgateshape}
+}
+
+\pgfdeclareshape{notgateshape}
+{
+    \saveddimen{\width}{\pgfpointscale{\pgfkeysvalueof{/tikz/circuits/scale}}{\pgfpoint{\pgfkeysvalueof{/tikz/circuits/logic gate/width}}{0pt}}}
+    \saveddimen{\height}{\pgfpointscale{\pgfkeysvalueof{/tikz/circuits/scale}}{\pgfpoint{\pgfkeysvalueof{/tikz/circuits/logic gate/height}}{0pt}}}
+    \saveddimen{\dotradius}{\pgfpointscale{\pgfkeysvalueof{/tikz/circuits/scale}}{\pgfpoint{\pgfkeysvalueof{/tikz/circuits/logic gate/dot radius}}{0pt}}}
+    % electrical terminals (anchors)
+    \anchor{in}{\pgfpoint{-0.5 * \width}{0pt}}
+    \anchor{out}{\pgfpoint{0.5 * \width + 2 * \dotradius}{0pt}}
+    \anchor{vdd}{\pgfpoint{0pt}{0.25 * \height}}
+    \anchor{vss}{\pgfpoint{0pt}{-0.25 * \height}}
+    % regular anchors
+    \anchor{center}{\pgfpointorigin}
+    \anchor{north}{\pgfpoint{0pt}{0.5 * \height}}
+    \anchor{south}{\pgfpoint{0pt}{-0.5 * \height}}
+    \anchor{west}{\pgfpoint{-0.5 * \width}{0pt}}
+    \anchor{east}{\pgfpoint{0.5 * \width}{0pt}}
+    \anchor{north east}{\pgfpoint{0.5 * \width}{0.5 * \height}}
+    \anchor{north west}{\pgfpoint{0.5 * \width}{-0.5 * \height}}
+    \anchor{south east}{\pgfpoint{-0.5 * \width}{0.5 * \height}}
+    \anchor{south west}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}
+    \anchor{center}{\pgfpointorigin}
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfsetmiterjoin
+        \pgfsetmiterlimit{2}
+        \pgfpathmoveto{\pgfpoint{-0.5 * \width}{-0.5 * \height}}
+        \pgfpathlineto{\pgfpoint{-0.5 * \width}{ 0.5 * \height}}
+        \pgfpathlineto{\pgfpoint{ 0.5 * \width}{0pt}}
+        \pgfpathclose
+        \color{white}
+        \pgfsetstrokecolor{black}
+        \pgfusepath{stroke, fill}
+        % draw output circle
+        \pgfpathcircle{\pgfpoint{0.5 * \width + \dotradius}{0pt}}{\dotradius}
+        \color{white}
+        \pgfsetstrokecolor{black}
+        \pgfusepath{stroke, fill}
+    }
+}
+
+% vim: ft=plaintex nowrap

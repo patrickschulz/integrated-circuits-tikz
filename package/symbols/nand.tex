@@ -1,0 +1,127 @@
+\tikzset{
+    circuits/nand/scale/.initial = 1,
+    circuits/nand/width/.initial = 0.4cm,
+    circuits/nand/input height/.initial = 0.8cm,
+    circuits/nand/output height/.initial = 0.32cm,
+    circuits/nand/dotradius/.initial = 2pt,
+    circuits/nand/input distribution factor/.initial = 0.6,
+    circuits/nand/output distribution factor/.initial = 0.8,
+    nand/.style = {nandshape}
+}
+
+\pgfdeclareshape{nandshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/nand/width}}
+    %\saveddimen{\width}{\pgfpointscale{\pgfkeysvalueof{/tikz/circuits/scale}}{\pgfpoint{\pgfkeysvalueof{/tikz/circuits/logic gate/width}}{0pt}}}
+    \saveddimen{\inputheight}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/nand/input height}}
+    \saveddimen{\outputheight}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/nand/output height}}
+    \saveddimen{\nanddotradius}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/nand/dotradius}}
+    \savedmacro{\inputdistribution}{\renewcommand{\inputdistribution}[0]{\pgfkeysvalueof{/tikz/circuits/nand/input distribution factor}}}
+    \savedmacro{\outputdistribution}{\renewcommand{\outputdistribution}[0]{\pgfkeysvalueof{/tikz/circuits/nand/output distribution factor}}}
+    \savedmacro{\scale}{\renewcommand{\scale}[0]{\pgfkeysvalueof{/tikz/circuits/nand/scale}}}
+    \savedanchor{\centerpoint}{\pgfpointorigin}
+    \savedanchor{\inputanchor}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/nand/width}}%
+            {0pt}%
+        }%
+    }
+    \savedanchor{\inputplus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/nand/width}}%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/nand/input height} * \pgfkeysvalueof{/tikz/circuits/nand/input distribution factor}}%
+        }%
+    }
+    \savedanchor{\inputminus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/nand/width}}%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/nand/input height} * \pgfkeysvalueof{/tikz/circuits/nand/input distribution factor}}%
+        }%
+    }
+    \savedanchor{\outputminus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/nand/width}}%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/nand/output height}}
+        }%
+    }
+    \savedanchor{\outputplus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/nand/width}}%
+            {0.5 * -\pgfkeysvalueof{/tikz/circuits/nand/output height}}
+        }%
+    }
+    \savedanchor{\output}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/nand/width}}%
+            {0pt}
+        }%
+    }
+    % electrical terminals (anchors)
+    \anchor{in}{\pgfpointadd{\centerpoint}{\pgfpoint{-\width/2}{0cm}}}
+    \anchor{out}{\pgfpointadd{\output}{\pgfpoint{\nanddotradius + \pgfkeysvalueof{/tikz/circuits/line width}}{0pt}}}
+    \anchor{in1}{\inputplus}
+    \anchor{in2}{\inputminus}
+    \anchor{topcontrol}{
+        \pgfpointlineattime%
+        {0.5}%
+        {\pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}}%
+        {\outputminus}
+    }
+    \anchor{botcontrol}{
+        \pgfpointlineattime%
+        {0.5}%
+        {\pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}}%
+        {\outputplus}
+    }
+    % regular anchors
+    \anchor{center}{\centerpoint}
+    \anchor{north}{
+        \pgfpointadd{\inputplus}{\pgfpoint{\width/2}{0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{south}{
+        \pgfpointadd{\inputminus}{\pgfpoint{\width/2}{-0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{west}{
+        \pgfpoint{-0.5 * \width}{0pt}
+    }
+    \anchor{east}{
+        \pgfpoint{0.5 * \width}{0pt}
+    }
+    \anchor{north west}{
+        \pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{south west}{
+        \pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{north east}{
+        \pgfpointadd{\inputplus}{\pgfpoint{\width}{0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{south east}{
+        \pgfpointadd{\inputminus}{\pgfpoint{\width}{-0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathmoveto{\pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}}
+        \pgfpathquadraticcurveto{\pgfpointadd{\output}{\pgfpoint{0pt}{0.4cm}}}{\output}
+        \pgfpathquadraticcurveto{\pgfpointadd{\output}{\pgfpoint{0pt}{-0.4cm}}}{\pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}}
+        \pgfpathlineto{\pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}}
+        \pgfpathclose
+        \pgfusepath{stroke}
+        \pgfpathcircle{\pgfpointadd{\output}{\pgfpoint{0.5 * \nanddotradius + \pgfkeysvalueof{/tikz/circuits/line width}}{0pt}}}{\nanddotradius}
+        \pgfusepath{stroke}
+    }
+}
+
+% vim: ft=plaintex nowrap

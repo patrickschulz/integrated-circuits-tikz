@@ -1,0 +1,63 @@
+\newif\ifantennadrawthrough
+\tikzset{
+    circuits/antenna/width/.initial = 0.35cm,
+    circuits/antenna/head height/.initial = 0.3cm,
+    circuits/antenna/foot height/.initial = 0.3cm,
+    circuits/antenna/draw through/.is if=antennadrawthrough,
+    antenna/.style = {antennashape, circuits/antenna/draw through = false}
+}
+
+\pgfdeclareshape{antennashape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/antenna/width}}
+    \saveddimen{\headheight}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/antenna/head height}}
+    \saveddimen{\footheight}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/antenna/foot height}}
+    \anchor{port}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-\footheight}}
+    }
+    \anchor{center}{\pgfpointorigin}
+    \anchor{head center}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{0.5 * \headheight}}
+    }
+    \anchor{north}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{\headheight}}
+    }
+    \anchor{south}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-\footheight}}
+    }
+    \anchor{south east}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{-\footheight}}
+    }
+    \anchor{south west}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-\footheight}}
+    }
+    \anchor{north east}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{\headheight}}
+    }
+    \anchor{north west}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{\headheight}}
+    }
+    \anchor{west}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{0cm}}
+    }
+    \anchor{east}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{0cm}}
+    }
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-\footheight}}}
+        \ifantennadrawthrough
+            \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{\headheight}}}
+        \else
+            \pgfpathlineto{\pgfpointorigin}
+        \fi
+        \pgfusepath{stroke}
+        \pgfpathmoveto{\pgfpointorigin}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{\headheight}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{\headheight}}}
+        \pgfpathclose
+        \pgfusepath{stroke}
+    }
+}
+
+% vim: ft=plaintex nowrap

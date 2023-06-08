@@ -1,0 +1,88 @@
+\tikzset{
+    circuits/statemachine/width/.initial = 1.3cm,
+    circuits/statemachine/trianglesize/.initial = 3pt,
+    circuits/statemachine/ports/.initial = 1,
+    circuits/statemachine/port pitch/.initial = 0.30cm,
+    statemachine/.style = {statemachineshape}
+}
+
+\pgfdeclareshape{statemachineshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/statemachine/width}}
+    \saveddimen{\trianglesize}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/statemachine/trianglesize}}
+    \saveddimen\height{
+        \pgfmathsetlength\pgf@x{(\pgfkeysvalueof{/tikz/circuits/statemachine/ports}) * \pgfkeysvalueof{/tikz/circuits/statemachine/port pitch}}%
+    }
+    \savedmacro{\ports}{\renewcommand{\ports}[0]{\pgfkeysvalueof{/tikz/circuits/statemachine/ports}}}
+    \saveddimen{\portpitch}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/statemachine/port pitch}}
+    \saveddimen{\dotradius}{\pgf@x=2pt}
+    % electrical anchors
+    \anchor{clk}{\pgfpoint{-0.5 * \width}{0pt + 1 * \portpitch}}
+    \anchor{reset}{\pgfpoint{-0.5 * \width - 2 * \dotradius}{0pt + 0 * \portpitch}}
+    % regular anchors
+    \anchor{text}
+    {
+        \pgfpoint{-0.5\wd\pgfnodeparttextbox}{-0.5\ht\pgfnodeparttextbox}
+    }
+    \anchor{center}{\pgfpointorigin}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{ 0.5 * \height}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{-0.5 * \height}}}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.0 * \height}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.0 * \height}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{-0.5 * \height}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+    \beforebackgroundpath{%
+        % draw body
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathrectangle %
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{\width}{\height}}}
+        \pgfusepath{stroke}
+        % draw clk triangle
+        \pgfpathmoveto{%
+            \pgfpointadd%
+                {\pgfpoint{-0.5 * \width}{0pt + 1 * \portpitch}}%
+                {\pgfpoint{0pt}{\trianglesize}}%
+        }
+        \pgfpathlineto{%
+            \pgfpointadd%
+                {\pgfpoint{-0.5 * \width}{0pt + 1 * \portpitch}}%
+                {\pgfpoint{\trianglesize}{0pt}}%
+        }
+        \pgfpathlineto{%
+            \pgfpointadd%
+                {\pgfpoint{-0.5 * \width}{0pt + 1 * \portpitch}}%
+                {\pgfpoint{0pt}{-\trianglesize}}%
+        }
+        \pgfusepath{stroke}
+        % draw reset circle
+        \pgfpathcircle{\pgfpoint{-0.5 * \width - \dotradius}{0pt}}{\dotradius}
+        \pgfusepath{stroke}
+    }
+    % \pgf@sh@s@statemachine contains all the code for the statemachine shape
+    % and is executed just before a statemachine node is drawn.
+    \pgfutil@g@addto@macro\pgf@sh@s@statemachineshape{%
+        % Start with the maximum pin number and go backwards.
+        % If the anchor is undefined, create it. Otherwise stop.
+        \c@pgf@counta=\pgfkeysvalueof{/tikz/circuits/statemachine/ports}\relax%
+        \pgfmathloop%
+        \ifnum\c@pgf@counta>0\relax%
+            \pgfutil@ifundefined{pgf@anchor@statemachineshape@port\space\the\c@pgf@counta}{%
+                \expandafter\xdef\csname pgf@anchor@statemachineshape@port\space\the\c@pgf@counta\endcsname{%
+                    \noexpand\statemachineportanchor{\the\c@pgf@counta}%
+                }%
+            }{\c@pgf@counta=0\relax}%
+            \advance\c@pgf@counta-1\relax%
+        \repeatpgfmathloop%  
+    }%
+}
+
+\def\statemachineportanchor#1{%
+    % When this macro is called,
+    % \width, \ports and \portpitch will be defined
+    \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{(#1 - 0.5 * (\ports + 1) - 1) * \portpitch}}
+}
+
+% vim: ft=plaintex

@@ -1,0 +1,112 @@
+\tikzset{
+    circuits/chip/width/.initial = 25pt,
+    circuits/chip/pad width/.initial = 0.125cm,
+    circuits/chip/pad height/.initial = 0.125cm,
+    circuits/chip/pad offset/.initial = 3.5pt,
+    circuits/chip/pad pitch/.initial = 0.2cm,
+    circuits/chip/left pins/.initial = 5,
+    circuits/chip/right pins/.initial = 7,
+    chip/.style = {chipshape, draw, circuits/general}
+}
+
+\pgfdeclareshape{chipshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/chip/width}}
+    \saveddimen\height{
+        \pgfmathsetlength\pgf@x{(max(\pgfkeysvalueof{/tikz/circuits/chip/right pins}, \pgfkeysvalueof{/tikz/circuits/chip/left pins})+1)*\pgfkeysvalueof{/tikz/circuits/chip/pad pitch}}%
+    }
+    \saveddimen{\padpitch}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/chip/pad pitch}}
+    \saveddimen{\padwidth}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/chip/pad width}}
+    \saveddimen{\padheight}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/chip/pad height}}
+    \savedmacro{\leftpins}{\renewcommand{\leftpins}[0]{\pgfkeysvalueof{/tikz/circuits/chip/left pins}}}
+    \savedmacro{\rightpins}{\renewcommand{\rightpins}[0]{\pgfkeysvalueof{/tikz/circuits/chip/right pins}}}
+    \saveddimen{\padoffset}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/chip/pad offset}}
+    \savedanchor{\centerpoint}{\pgfpointorigin}
+    % electrical anchors
+    \anchor{rightmidpad}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width - \padoffset - 0.5 * \padwidth}{0cm}}}
+    \anchor{leftmidpad}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width + \padoffset + 0.5 * \padwidth}{0cm}}}
+    % regular anchors
+    \anchor{text}
+    {
+        \pgfpoint{-0.5\wd\pgfnodeparttextbox}{-0.5\ht\pgfnodeparttextbox}
+    }
+    \anchor{center}{\centerpoint}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{ 0.5 * \height}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{-0.5 * \height}}}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.0 * \height}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.0 * \height}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{-0.5 * \height}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.0 * \height}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.0 * \height}}}
+    \anchorborder{
+        \@tempdima=\pgf@x
+        \@tempdimb=\pgf@y
+        \pgfpointborderrectangle{\pgfpoint{\@tempdima}{\@tempdimb}}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{0.5 * \height}}}
+    }
+    \backgroundpath{%
+        \pgfpathrectanglecorners %
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    }
+    \beforebackgroundpath{%
+        \foreach \y in {1, 2, ..., \leftpins}
+        {
+            \pgfpathrectangle%
+                {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width + \padwidth + \padoffset}{(\y - 0.5 * (\leftpins + 1)) * \padpitch - 0.5 * \padheight}}}
+                {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\padwidth}{\padheight}}}
+        }
+        \foreach \y in {1, 2, ..., \rightpins}
+        {
+            \pgfpathrectangle%
+                {\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width - \padwidth - \padoffset}{(\y - 0.5 * (\rightpins + 1)) * \padpitch - 0.5 * \padheight}}}
+                {\pgfpointadd{\pgfpointorigin}{\pgfpoint{\padwidth}{\padheight}}}
+        }
+    }
+    % \pgf@sh@s@chip contains all the code for the chip shape
+    % and is executed just before a chip node is drawn.
+    \pgfutil@g@addto@macro\pgf@sh@s@chipshape{%
+        % Start with the maximum pin number and go backwards.
+        % If the anchor is undefined, create it. Otherwise stop.
+        \c@pgf@counta=\pgfkeysvalueof{/tikz/circuits/chip/right pins}\relax%
+        \pgfmathloop%
+        \ifnum\c@pgf@counta>0\relax%
+            \pgfutil@ifundefined{pgf@anchor@chipshape@pin\space\the\c@pgf@counta}{%
+                \expandafter\xdef\csname pgf@anchor@chipshape@rightpin\space\the\c@pgf@counta\endcsname{%
+                    \noexpand\chiprightpinanchor{\the\c@pgf@counta}%
+                }%
+            }{\c@pgf@counta=0\relax}%
+            \advance\c@pgf@counta-1\relax%
+        \repeatpgfmathloop%  
+    }%
+    % \pgf@sh@s@chip contains all the code for the chip shape
+    % and is executed just before a chip node is drawn.
+    \pgfutil@g@addto@macro\pgf@sh@s@chipshape{%
+        % Start with the maximum pin number and go backwards.
+        % If the anchor is undefined, create it. Otherwise stop.
+        \c@pgf@counta=\pgfkeysvalueof{/tikz/circuits/chip/left pins}\relax%
+        \pgfmathloop%
+        \ifnum\c@pgf@counta>0\relax%
+            \pgfutil@ifundefined{pgf@anchor@chipshape@pin\space\the\c@pgf@counta}{%
+                \expandafter\xdef\csname pgf@anchor@chipshape@leftpin\space\the\c@pgf@counta\endcsname{%
+                    \noexpand\chipleftpinanchor{\the\c@pgf@counta}%
+                }%
+            }{\c@pgf@counta=0\relax}%
+            \advance\c@pgf@counta-1\relax%
+        \repeatpgfmathloop%  
+    }%
+}
+
+\def\chiprightpinanchor#1{%
+    % When this macro is called,
+    % \width, \needlelength, \pins and \padpitch will be defined
+    \pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width - 0.5 * \padwidth - \padoffset}{(#1 - 0.5 * (\rightpins + 1)) * \padpitch}}
+}
+\def\chipleftpinanchor#1{%
+    % When this macro is called,
+    % \width, \needlelength, \pins and \padpitch will be defined
+    \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width + 0.5 * \padwidth + \padoffset}{(#1 - 0.5 * (\leftpins + 1)) * \padpitch}}
+}
+
+
+% vim: ft=plaintex

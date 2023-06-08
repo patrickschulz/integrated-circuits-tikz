@@ -1,0 +1,23 @@
+\tikzset{
+    circuits/vdd/width/.initial = 0.25cm,
+    vdd/.style = {vddshape}
+}
+
+\pgfdeclareshape{vddshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/vdd/width}}
+    % general anchors
+    \anchor{center}{\pgfpointorigin}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{0cm}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{0cm}}}
+    \anchor{north}{\pgfpointorigin}
+    \anchor{south}{\pgfpointorigin}
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+            \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{0cm}}}
+            \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{0cm}}}
+        \pgfusepath{stroke}
+    }
+}
+
+% vim: ft=plaintex nowrap

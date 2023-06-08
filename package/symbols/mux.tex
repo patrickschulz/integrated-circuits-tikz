@@ -1,0 +1,105 @@
+\tikzset{
+    circuits/mux/width/.initial = 1cm,
+    circuits/mux/input height/.initial = 1cm,
+    circuits/mux/output height/.initial = 0.6cm,
+    circuits/mux/input distribution factor/.initial = 0.6,
+    circuits/mux/output distribution factor/.initial = 0.8,
+    circuits/mux/no pin labels/.is if=muxnopinlabels,
+    mux/.style = {muxshape}
+}
+
+\pgfdeclareshape{muxshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/mux/width}}
+    \saveddimen{\inputheight}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/mux/input height}}
+    \saveddimen{\outputheight}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/mux/output height}}
+    \savedmacro{\inputdistribution}{\renewcommand{\inputdistribution}[0]{\pgfkeysvalueof{/tikz/circuits/mux/input distribution factor}}}
+    \savedmacro{\outputdistribution}{\renewcommand{\outputdistribution}[0]{\pgfkeysvalueof{/tikz/circuits/mux/output distribution factor}}}
+    \savedanchor{\centerpoint}{\pgfpointorigin}
+    \savedanchor{\inputplus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/mux/width}}%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/mux/input height} * \pgfkeysvalueof{/tikz/circuits/mux/input distribution factor}}%
+        }%
+    }
+    \savedanchor{\inputminus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/mux/width}}%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/mux/input height} * \pgfkeysvalueof{/tikz/circuits/mux/input distribution factor}}%
+        }%
+    }
+    \savedanchor{\outputminus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/mux/width}}%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/mux/output height}}
+        }%
+    }
+    \savedanchor{\outputplus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/mux/width}}%
+            {0.5 * -\pgfkeysvalueof{/tikz/circuits/mux/output height}}
+        }%
+    }
+    % electrical terminals (anchors)
+    \anchor{in}{\pgfpointadd{\centerpoint}{\pgfpoint{-\width/2}{0cm}}}
+    \anchor{out}{\pgfpointadd{\centerpoint}{\pgfpoint{\width/2}{0cm}}}
+    \anchor{in1}{\inputplus}
+    \anchor{in2}{\inputminus}
+    \anchor{topcontrol}{
+        \pgfpointlineattime%
+        {0.5}%
+        {\pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}}%
+        {\outputminus}
+    }
+    \anchor{botcontrol}{
+        \pgfpointlineattime%
+        {0.5}%
+        {\pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}}%
+        {\outputplus}
+    }
+    % regular anchors
+    \anchor{center}{\centerpoint}
+    \anchor{north}{
+        \pgfpointadd{\inputplus}{\pgfpoint{\width/2}{0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{south}{
+        \pgfpointadd{\inputminus}{\pgfpoint{\width/2}{-0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{west}{
+        \pgfpoint{-0.5 * \width}{0cm}
+    }
+    \anchor{east}{
+        \pgfpoint{0.5 * \width}{0cm}
+    }
+    \anchor{north west}{
+        \pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{south west}{
+        \pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{north east}{
+        \pgfpointadd{\inputplus}{\pgfpoint{\width}{0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{south east}{
+        \pgfpointadd{\inputminus}{\pgfpoint{\width}{-0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathmoveto{\pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}}
+        \pgfpathlineto{\outputminus}
+        \pgfpathlineto{\outputplus}
+        \pgfpathlineto{\pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}}
+        \pgfpathclose
+        \pgfusepath{stroke}
+    }
+}
+
+% vim: ft=plaintex nowrap

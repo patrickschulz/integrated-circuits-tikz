@@ -1,0 +1,171 @@
+\newif\ifcomparator@drawinputlabels
+\newif\ifcomparator@flip@inputs
+\newif\ifcomparator@flip@outputs
+\newif\ifcomparator@fullydifferential
+
+\tikzset{
+    circuits/comparator/width/.initial = 1cm,
+    circuits/comparator/height/.initial = 1cm,
+    circuits/comparator/annotation width/.initial = 4pt,
+    circuits/comparator/annotation height/.initial = 6pt,
+    circuits/comparator/input distribution factor/.initial = 0.4,
+    circuits/comparator/output distribution factor/.initial = 0.6,
+    circuits/comparator/label size/.initial = 5pt,
+    circuits/comparator/label shift/.initial = 5pt,
+    circuits/comparator/draw input labels/.is if=comparator@drawinputlabels,
+    circuits/comparator/flip inputs/.is if=comparator@flip@inputs,
+    circuits/comparator/flip outputs/.is if=comparator@flip@outputs,
+    circuits/comparator/fully differential/.is if=comparator@fullydifferential,
+    comparator/.style = {fdcomparatorshape, circuits/comparator/draw input labels = true, circuits/comparator/fully differential=false},
+    fdcomparator/.style = {fdcomparatorshape, circuits/comparator/draw input labels = true, circuits/comparator/fully differential=true}
+}
+
+\pgfdeclareshape{fdcomparatorshape}
+{
+    \saveddimen{\circuits@comparator@width}{\pgfpointscale{\pgfkeysvalueof{/tikz/circuits/scale}}{\pgfpoint{\pgfkeysvalueof{/tikz/circuits/comparator/width}}{0pt}}}
+    \saveddimen{\circuits@comparator@anno@width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/comparator/annotation width}}
+    \saveddimen{\circuits@comparator@anno@height}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/comparator/annotation height}}
+    \saveddimen{\circuits@comparator@inputheight}{\pgfpointscale{\pgfkeysvalueof{/tikz/circuits/scale}}{\pgfpoint{\pgfkeysvalueof{/tikz/circuits/comparator/height}}{0pt}}}
+    \savedmacro{\circuits@comparator@inputdistribution}{\renewcommand{\circuits@comparator@inputdistribution}[0]{\pgfkeysvalueof{/tikz/circuits/comparator/input distribution factor}}}
+    \savedmacro{\circuits@comparator@outputdistribution}{\renewcommand{\circuits@comparator@outputdistribution}[0]{\pgfkeysvalueof{/tikz/circuits/comparator/output distribution factor}}}
+    \saveddimen{\circuits@comparator@labelsize}{\pgfpointscale{\pgfkeysvalueof{/tikz/circuits/scale}}{\pgfpoint{\pgfkeysvalueof{/tikz/circuits/comparator/label size}}{0pt}}}
+    \saveddimen{\circuits@comparator@labelshift}{\pgfpointscale{\pgfkeysvalueof{/tikz/circuits/scale}}{\pgfpoint{\pgfkeysvalueof{/tikz/circuits/comparator/label shift}}{0pt}}}
+    \savedanchor{\circuits@comparator@input}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/scale} * \pgfkeysvalueof{/tikz/circuits/comparator/width}}%
+            {0cm}%
+        }%
+    }
+    \savedanchor{\circuits@comparator@inputplus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/scale} * \pgfkeysvalueof{/tikz/circuits/comparator/width}}%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/scale} * \pgfkeysvalueof{/tikz/circuits/comparator/height} * \pgfkeysvalueof{/tikz/circuits/comparator/input distribution factor}}%
+        }%
+    }
+    \savedanchor{\circuits@comparator@inputminus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/scale} * \pgfkeysvalueof{/tikz/circuits/comparator/width}}%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/scale} * \pgfkeysvalueof{/tikz/circuits/comparator/height} * \pgfkeysvalueof{/tikz/circuits/comparator/input distribution factor}}%
+        }%
+    }
+    \savedanchor{\circuits@comparator@output}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/scale} * \pgfkeysvalueof{/tikz/circuits/comparator/width}}%
+            {0cm}
+        }%
+    }
+    % electrical terminals (anchors)
+    \anchor{cmin}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\circuits@comparator@width/2}{0cm}}}
+    \anchor{cmout}{\circuits@comparator@output}
+    \anchor{out}{\circuits@comparator@output}
+    \anchor{in}{\circuits@comparator@input}
+    \anchor{+in}{\circuits@comparator@inputplus}
+    \anchor{-in}{\circuits@comparator@inputminus}
+    \anchor{+out}{
+        \pgfpointlineattime%
+        {\circuits@comparator@outputdistribution}%
+        {\pgfpointadd{\circuits@comparator@inputplus}{\pgfpoint{0cm}{0.5 * \circuits@comparator@inputheight * (1 - \circuits@comparator@inputdistribution)}}}%
+        {\circuits@comparator@output}%
+    }
+    \anchor{-out}{
+        \pgfpointlineattime%
+        {\circuits@comparator@outputdistribution}%
+        {\pgfpointadd{\circuits@comparator@inputminus}{\pgfpoint{0cm}{-0.5 * \circuits@comparator@inputheight * (1 - \circuits@comparator@inputdistribution)}}}%
+        {\circuits@comparator@output}%
+    }
+    \anchor{+power}{
+        \pgfpointlineattime%
+        {0.5}%
+        {\pgfpointadd{\circuits@comparator@inputplus}{\pgfpoint{0cm}{0.5 * \circuits@comparator@inputheight * (1 - \circuits@comparator@inputdistribution)}}}%
+        {\circuits@comparator@output}%
+    }
+    \anchor{-power}{
+        \pgfpointlineattime%
+        {0.5}%
+        {\pgfpointadd{\circuits@comparator@inputminus}{\pgfpoint{0cm}{-0.5 * \circuits@comparator@inputheight * (1 - \circuits@comparator@inputdistribution)}}}%
+        {\circuits@comparator@output}%
+    }
+
+    % regular anchors
+    \anchor{center}{\pgfpointorigin}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\circuits@comparator@width/2}{0cm}}}
+    \anchor{east}{\circuits@comparator@output}
+    \anchor{north}{
+        \pgfpointadd{\circuits@comparator@inputplus}{\pgfpoint{\circuits@comparator@width/2}{0.5 * \circuits@comparator@inputheight * (1 - \circuits@comparator@inputdistribution)}}
+    }
+    \anchor{south}{
+        \pgfpointadd{\circuits@comparator@inputminus}{\pgfpoint{\circuits@comparator@width/2}{-0.5 * \circuits@comparator@inputheight * (1 - \circuits@comparator@inputdistribution)}}
+    }
+    \anchor{north west}{
+        \pgfpointadd{\circuits@comparator@inputplus}{\pgfpoint{0cm}{0.5 * \circuits@comparator@inputheight * (1 - \circuits@comparator@inputdistribution)}}
+    }
+    \anchor{south west}{
+        \pgfpointadd{\circuits@comparator@inputminus}{\pgfpoint{0cm}{-0.5 * \circuits@comparator@inputheight * (1 - \circuits@comparator@inputdistribution)}}
+    }
+    \anchor{north east}{
+        \pgfpointadd{\circuits@comparator@inputplus}{\pgfpoint{\circuits@comparator@width}{0.5 * \circuits@comparator@inputheight * (1 - \circuits@comparator@inputdistribution)}}
+    }
+    \anchor{south east}{
+        \pgfpointadd{\circuits@comparator@inputminus}{\pgfpoint{\circuits@comparator@width}{-0.5 * \circuits@comparator@inputheight * (1 - \circuits@comparator@inputdistribution)}}
+    }
+    \backgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathmoveto{\pgfpointadd{\circuits@comparator@inputplus}{\pgfpoint{0cm}{0.5 * \circuits@comparator@inputheight * (1 - \circuits@comparator@inputdistribution)}}}
+        \pgfpathlineto{\circuits@comparator@output}
+        \pgfpathlineto{\pgfpointadd{\circuits@comparator@inputminus}{\pgfpoint{0cm}{-0.5 * \circuits@comparator@inputheight * (1 - \circuits@comparator@inputdistribution)}}}
+        \pgfpathclose
+    }
+    \beforebackgroundpath{
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\circuits@comparator@anno@width}{-0.5 * \circuits@comparator@anno@height}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \circuits@comparator@anno@width}{-0.5 * \circuits@comparator@anno@height}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \circuits@comparator@anno@width}{0.5 * \circuits@comparator@anno@height}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0pt}{0.5 * \circuits@comparator@anno@height}}}
+        \pgfusepath{stroke}
+        \ifcomparator@drawinputlabels
+            \ifcomparator@flip@inputs
+                \pgfpathmoveto{\pgfpointadd{\circuits@comparator@inputminus}{\pgfpoint{\circuits@comparator@labelshift - 0.5 * \circuits@comparator@labelsize}{0pt}}}
+                \pgfpathlineto{\pgfpointadd{\circuits@comparator@inputminus}{\pgfpoint{\circuits@comparator@labelshift + 0.5 * \circuits@comparator@labelsize}{0pt}}}
+                \pgfusepath{stroke}
+                \pgfpathmoveto{\pgfpointadd{\circuits@comparator@inputminus}{\pgfpoint{\circuits@comparator@labelshift}{-0.5 * \circuits@comparator@labelsize}}}
+                \pgfpathlineto{\pgfpointadd{\circuits@comparator@inputminus}{\pgfpoint{\circuits@comparator@labelshift}{0.5 * \circuits@comparator@labelsize}}}
+                \pgfusepath{stroke}
+                \pgfpathmoveto{\pgfpointadd{\circuits@comparator@inputplus}{\pgfpoint{\circuits@comparator@labelshift - 0.5 * \circuits@comparator@labelsize}{0pt}}}
+                \pgfpathlineto{\pgfpointadd{\circuits@comparator@inputplus}{\pgfpoint{\circuits@comparator@labelshift + 0.5 * \circuits@comparator@labelsize}{0pt}}}
+                \pgfusepath{stroke}
+            \else
+                \pgfpathmoveto{\pgfpointadd{\circuits@comparator@inputplus}{\pgfpoint{\circuits@comparator@labelshift - 0.5 * \circuits@comparator@labelsize}{0pt}}}
+                \pgfpathlineto{\pgfpointadd{\circuits@comparator@inputplus}{\pgfpoint{\circuits@comparator@labelshift + 0.5 * \circuits@comparator@labelsize}{0pt}}}
+                \pgfusepath{stroke}
+                \pgfpathmoveto{\pgfpointadd{\circuits@comparator@inputplus}{\pgfpoint{\circuits@comparator@labelshift}{-0.5 * \circuits@comparator@labelsize}}}
+                \pgfpathlineto{\pgfpointadd{\circuits@comparator@inputplus}{\pgfpoint{\circuits@comparator@labelshift}{0.5 * \circuits@comparator@labelsize}}}
+                \pgfusepath{stroke}
+                \pgfpathmoveto{\pgfpointadd{\circuits@comparator@inputminus}{\pgfpoint{\circuits@comparator@labelshift - 0.5 * \circuits@comparator@labelsize}{0pt}}}
+                \pgfpathlineto{\pgfpointadd{\circuits@comparator@inputminus}{\pgfpoint{\circuits@comparator@labelshift + 0.5 * \circuits@comparator@labelsize}{0pt}}}
+                \pgfusepath{stroke}
+            \fi
+        \fi
+        \ifcomparator@fullydifferential
+            \ifcomparator@flip@outputs
+                \pgftext[at={\pgfpointlineattime{\circuits@comparator@outputdistribution}{\pgfpointadd{\circuits@comparator@inputplus}{\pgfpoint{0cm}{0.5 * \circuits@comparator@inputheight * (1 -
+                \circuits@comparator@inputdistribution)}}}{\circuits@comparator@output} }, x = -3pt, y=-3pt]{\tiny$+$}
+                \pgftext[at={\pgfpointlineattime{\circuits@comparator@outputdistribution}{\pgfpointadd{\circuits@comparator@inputminus}{\pgfpoint{0cm}{-0.5 * \circuits@comparator@inputheight * (1 -
+                \circuits@comparator@inputdistribution)}}}{\circuits@comparator@output} }, x = -3pt, y=3pt]{\tiny$-$}
+            \else
+                \pgftext[at={\pgfpointlineattime{\circuits@comparator@outputdistribution}{\pgfpointadd{\circuits@comparator@inputplus}{\pgfpoint{0cm}{0.5 * \circuits@comparator@inputheight * (1 -
+                \circuits@comparator@inputdistribution)}}}{\circuits@comparator@output} }, x = -3pt, y=-3pt]{\tiny$-$}
+                \pgftext[at={\pgfpointlineattime{\circuits@comparator@outputdistribution}{\pgfpointadd{\circuits@comparator@inputminus}{\pgfpoint{0cm}{-0.5 * \circuits@comparator@inputheight * (1 -
+                \circuits@comparator@inputdistribution)}}}{\circuits@comparator@output} }, x = -3pt, y=3pt]{\tiny$+$}
+            \fi
+        \fi
+    }
+}
+
+% vim: ft=plaintex nowrap

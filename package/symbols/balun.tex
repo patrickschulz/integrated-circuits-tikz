@@ -1,0 +1,82 @@
+\tikzset{
+    circuits/balun/width/.initial = 1.2cm,
+    circuits/balun/height/.initial = 0.6cm,
+    circuits/balun/port width/.initial = 2.5pt,
+    circuits/balun/port height/.initial = 2.5pt,
+    balun/.style = {balunshape, draw, circuits/general}
+}
+
+\pgfdeclareshape{balunshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/balun/width}}
+    \saveddimen{\height}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/balun/height}}
+    \saveddimen{\portwidth}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/balun/port width}}
+    \saveddimen{\portheight}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/balun/port height}}
+    \savedanchor{\centerpoint}{\pgfpointorigin}
+    \savedanchor{\diffplus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/balun/width}}%
+            {0.25 * \pgfkeysvalueof{/tikz/circuits/balun/height}}
+        }%
+    }
+    \savedanchor{\diffminus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/balun/width}}%
+            {-0.25 * \pgfkeysvalueof{/tikz/circuits/balun/height}}
+        }%
+    }
+    \savedanchor{\singleended}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/balun/width}}%
+            {0pt}
+        }%
+    }
+    % electrical terminals (anchors)
+    \anchor{diffp}{\diffplus}
+    \anchor{diffn}{\diffminus}
+    \anchor{singleended}{\singleended}
+    % regular anchors
+    \anchor{center}{\centerpoint}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{ 0.5 * \height}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{-0.5 * \height}}}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.0 * \height}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.0 * \height}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{-0.5 * \height}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.0 * \height}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.0 * \height}}}
+    \anchorborder{
+        \@tempdima=\pgf@x
+        \@tempdimb=\pgf@y
+        \pgfpointborderrectangle{\pgfpoint{\@tempdima}{\@tempdimb}}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    }
+    \beforebackgroundpath{
+        \pgfpathrectangle %
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{\width}{\height}}}
+        \pgfusepath{stroke}
+        \pgfpathrectangle %
+            {\pgfpointadd{\diffplus}{\pgfpoint{-0.5 * \portwidth}{-0.5 * \portheight}}}
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{\portwidth}{\portheight}}}
+        \pgfusepath{fill}
+        \pgfpathrectangle %
+            {\pgfpointadd{\diffminus}{\pgfpoint{-0.5 * \portwidth}{-0.5 * \portheight}}}
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{\portwidth}{\portheight}}}
+        \pgfusepath{fill}
+        \pgfpathrectangle %
+            {\pgfpointadd{\singleended}{\pgfpoint{-0.5 * \portwidth}{-0.5 * \portheight}}}
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{\portwidth}{\portheight}}}
+        \pgfusepath{fill}
+        %\pgftext[left, at={\diffplus}, x = 2pt]{\tiny DATA}
+        %\pgftext[left, at={\diffminus}, x = 2pt]{\tiny $\overline{\text{DATA}}$}
+        %\pgftext[right, at={\singleended}, x = -2pt]{\tiny OUT}
+    }
+}
+
+% vim: ft=plaintex nowrap

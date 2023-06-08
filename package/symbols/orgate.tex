@@ -1,0 +1,87 @@
+\newif\if@circuits@orgate@isnor
+\tikzset{
+    circuits/orgate/width/.initial = 0.8cm,
+    circuits/orgate/height/.initial = 0.8cm,
+    circuits/orgate/dotradius/.initial = 2pt,
+    circuits/orgate/input distribution factor/.initial = 0.6,
+    circuits/orgate/output distribution factor/.initial = 0.8,
+    circuits/orgate/is nor/.is if=@circuits@orgate@isnor,
+    orgate/.style = {norgateshape, circuits/orgate/is nor = false, circuits/orgate/dotradius = 0pt},
+    norgate/.style = {norgateshape, circuits/orgate/is nor = true}
+}
+
+\pgfdeclareshape{norgateshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/orgate/width}}
+    \saveddimen{\height}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/orgate/height}}
+    \saveddimen{\ordotradius}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/orgate/dotradius}}
+    \savedmacro{\inputdistribution}{\renewcommand{\inputdistribution}[0]{\pgfkeysvalueof{/tikz/circuits/orgate/input distribution factor}}}
+    \savedanchor{\inputplus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/orgate/width}}%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/orgate/height} * \pgfkeysvalueof{/tikz/circuits/orgate/input distribution factor}}%
+        }%
+    }
+    \savedanchor{\inputminus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/orgate/width}}%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/orgate/height} * \pgfkeysvalueof{/tikz/circuits/orgate/input distribution factor}}%
+        }%
+    }
+    \savedanchor{\output}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/orgate/width}}%
+            {0pt}
+        }%
+    }
+    % electrical terminals (anchors)
+    \anchor{in}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\width/2}{0cm}}}
+    \anchor{out}{\pgfpointadd{\output}{\pgfpoint{\ordotradius + 2.5 * \pgfkeysvalueof{/tikz/circuits/line width}}{0pt}}\if@circuits@orgate@isnor\pgf@x = \pgf@x + 5pt\fi}
+    \anchor{in1}{\inputplus}
+    \anchor{in2}{\inputminus}
+    % regular anchors
+    \anchor{center}{\pgfpointorigin}
+    \anchor{north}{\pgfpointadd{\inputplus}{\pgfpoint{\width/2}{0.5 * \height * (1 - \inputdistribution)}}}
+    \anchor{south}{\pgfpointadd{\inputminus}{\pgfpoint{\width/2}{-0.5 * \height * (1 - \inputdistribution)}}}
+    \anchor{west}{\pgfpoint{-0.5 * \width}{0pt}}
+    \anchor{east}{\pgfpoint{0.5 * \width}{0pt}}
+    \anchor{north west}{\pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \height * (1 - \inputdistribution)}}}
+    \anchor{south west}{\pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \height * (1 - \inputdistribution)}}}
+    \anchor{north east}{\pgfpointadd{\inputplus}{\pgfpoint{\width}{0.5 * \height * (1 - \inputdistribution)}}}
+    \anchor{south east}{\pgfpointadd{\inputminus}{\pgfpoint{\width}{-0.5 * \height * (1 - \inputdistribution)}}}
+    %\beforebackgroundpath{
+    %    \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+    %    \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width - 0.5 * \height}{ 0.5 * \height}}}
+    %    \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.5 * \height}}}
+    %    \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+    %    \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width - 0.5 * \height}{-0.5 * \height}}}
+    %    \pgfpatharc{-90}{90}{0.5 * \height}
+    %    \pgfpathclose
+    %    \pgfusepath{stroke}
+    %    \if@circuits@orgate@isnor
+    %        \pgfpathcircle{\pgfpointadd{\output}{\pgfpoint{0.5 * \ordotradius + 1.5 * \pgfkeysvalueof{/tikz/circuits/line width}}{0pt}}}{\ordotradius}
+    %        \pgfusepath{stroke}
+    %    \fi
+    %}
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+        \pgfpathquadraticcurveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0pt}{0pt}}}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.5 * \height}}}
+        \pgfpathquadraticcurveto{\pgfpointadd{\output}{\pgfpoint{-0.3cm}{0.5cm}}}{\output}
+        \pgfpathquadraticcurveto{\pgfpointadd{\output}{\pgfpoint{-0.3cm}{-0.5cm}}}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+        \pgfpathclose
+        \pgfusepath{stroke}
+        \if@circuits@orgate@isnor
+            \pgfpathcircle{\pgfpointadd{\output}{\pgfpoint{0.5 * \ordotradius + 1.5 * \pgfkeysvalueof{/tikz/circuits/line width}}{0pt}}}{\ordotradius}
+            \pgfusepath{stroke}
+        \fi
+    }
+}
+
+% vim: ft=plaintex nowrap

@@ -1,0 +1,79 @@
+\tikzset{
+    circuits/resistor/width/.initial = 0.6cm,
+    circuits/resistor/height/.initial = 0.25cm,
+    circuits/resistor/segments/.initial = 3,
+    circuits/resistor/terminal extension/.initial = 0.05cm,
+    resistor/.style = {americanresistorshape, draw, wire}
+}
+
+\pgfdeclareshape{americanresistorshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/resistor/width}}
+    \saveddimen{\height}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/resistor/height}}
+    \saveddimen{\extension}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/resistor/terminal extension}}
+    \savedmacro{\segments}{\renewcommand{\segments}[0]{\pgfkeysvalueof{/tikz/circuits/resistor/segments}}}
+    \savedanchor{\leftpoint}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \pgfkeysvalueof{/tikz/circuits/resistor/width}- \pgfkeysvalueof{/tikz/circuits/resistor/terminal extension}}{0cm}}
+    }
+    \savedanchor{\rightpoint}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \pgfkeysvalueof{/tikz/circuits/resistor/width} + \pgfkeysvalueof{/tikz/circuits/resistor/terminal extension}}{0cm}}
+    }
+
+    % electrical terminals
+    \anchor{plus}{\leftpoint}
+    \anchor{minus}{\rightpoint}
+    % general anchors
+    \anchor{center}{\pgfpointorigin}
+    \anchor{west}{\leftpoint}
+    \anchor{east}{\rightpoint}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{0.5 * \height}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-0.5 * \height}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \height}{-0.5 * \width}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \height}{-0.5 * \width}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \height}{0.5 * \width}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \height}{0.5 * \width}}}
+    \backgroundpath{
+        \pgfsetmiterjoin
+        \pgfsetmiterlimit{5}
+        \pgfpathmoveto{\leftpoint}
+        \pgfpathlineto{\pgfpointadd{\leftpoint}{\pgfpoint{\extension}{0cm}}}
+        \foreach \x [count=\xi, evaluate=\xi as \y using isodd(\xi)-0.5] in {0.25,0.75,...,\segments}
+        {
+            \pgfpathlineto{\pgfpointadd{\leftpoint}{\pgfpoint{\extension + 4 * \x * \width / (4 * \segments)}{\y * \height}}}
+        }
+        \pgfpathlineto{\pgfpointadd{\rightpoint}{\pgfpoint{-\extension}{0cm}}}
+        \pgfpathlineto{\rightpoint}
+    }
+}
+\pgfdeclareshape{europeenresistorshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/resistor/width}}
+    \saveddimen{\height}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/resistor/height}}
+    \savedanchor{\lowerleft}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \pgfkeysvalueof{/tikz/circuits/resistor/width}}{-0.5 * \pgfkeysvalueof{/tikz/circuits/resistor/height}}}
+    }
+    \savedanchor{\upperright}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \pgfkeysvalueof{/tikz/circuits/resistor/width}}{0.5 * \pgfkeysvalueof{/tikz/circuits/resistor/height}}}
+    }
+
+    % electrical terminals
+    \anchor{plus}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{0cm}}}
+    \anchor{minus}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{0cm}}}
+    % general anchors
+    \anchor{lowerleft}{\lowerleft}
+    \anchor{upperright}{\upperright}
+    \anchor{center}{\pgfpointorigin}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{0cm}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{0cm}}}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{0.5 * \height}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-0.5 * \height}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \height}{-0.5 * \width}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \height}{-0.5 * \width}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \height}{0.5 * \width}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \height}{0.5 * \width}}}
+    \backgroundpath{
+        \pgfpathrectanglecorners{\lowerleft}{\upperright}
+    }
+}
+
+% vim: ft=plaintex

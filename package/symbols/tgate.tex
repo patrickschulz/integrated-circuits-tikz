@@ -1,0 +1,109 @@
+\tikzset{
+    circuits/transmission gate/width/.initial = 1cm,
+    circuits/transmission gate/height/.initial = 1cm,
+    circuits/transmission gate/circle size/.initial = 3pt,
+    transmission gate/.style = {tgateshape},
+    tgate/.style = {tgateshape}
+}
+
+\pgfdeclareshape{tgateshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/transmission gate/width}}
+    \saveddimen{\height}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/transmission gate/height}}
+    \saveddimen{\circlesize}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/transmission gate/circle size}}
+    \savedanchor{\centerpoint}{\pgfpointorigin}
+    \savedanchor{\inputport}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/transmission gate/width}}%
+            {0cm}
+        }%
+    }
+    \savedanchor{\output}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/transmission gate/width}}%
+            {0cm}
+        }%
+    }
+    % electrical terminals (anchors)
+    \anchor{in}{\pgfpointadd{\centerpoint}{\pgfpoint{-0.5 * \width}{0cm}}}
+    \anchor{out}{\output}
+    \anchor{clkp}{
+        \pgfpointadd{%
+            \pgfpointlineattime%
+            {0.5}%
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{0.5 * \height}}}
+            {\output}%
+        }{\pgfpoint{0pt}{2 * \circlesize + 0.5pt}}%
+    }
+    \anchor{clkn}{
+        \pgfpointadd{%
+            \pgfpointlineattime%
+            {0.5}%
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+            {\output}%
+        }{\pgfpoint{0pt}{0pt}}%
+    }
+    % regular anchors
+    \anchor{center}{\centerpoint}
+    \anchor{text} % this is used to center the text in the node
+    {
+        %\pgfpoint{-.5\wd\pgfnodeparttextbox}{-.5\ht\pgfnodeparttextbox}
+        % the text node is shifted more than its width, a way of optical compensation (since the transmission gate gets more narrow to the right)
+        \pgfpoint{-0.75\wd\pgfnodeparttextbox}{-0.5\ht\pgfnodeparttextbox}
+    }
+    \anchor{north}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{0.5 * \height}}
+    }
+    \anchor{south}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-0.5 * \height}}
+    }
+    \anchor{west}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{0cm}}
+    }
+    \anchor{east}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{0cm}}
+    }
+    \anchor{north east}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{0.5 * \height}}
+    }
+    \anchor{north west}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{0.5 * \height}}
+    }
+    \anchor{south east}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{-0.5 * \height}}
+    }
+    \anchor{south west}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}
+    }
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathmoveto{\output}
+        \pgfpathlineto{\pgfpointadd{\output}{\pgfpoint{-\width}{-0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\output}{\pgfpoint{-\width}{0.5 * \height}}}
+        \pgfpathclose
+        \pgfusepath{stroke}
+        \pgfpathmoveto{\pgfpointadd{\output}{\pgfpoint{0pt}{0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\output}{\pgfpoint{0pt}{-0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\output}{\pgfpoint{-\width}{0pt}}}
+        \pgfpathclose
+        \pgfusepath{stroke}
+        % draw input inversion
+        \pgfpathcircle%
+        {
+            \pgfpointadd{%
+                \pgfpointlineattime%
+                {0.5}%
+                {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{0.5 * \height}}}
+                {\output}%
+            }{\pgfpoint{0pt}{\circlesize + 0.5pt}}%
+        }
+        {\circlesize}
+        \pgfusepath{stroke}
+    }
+}
+
+% vim: ft=plaintex nowrap

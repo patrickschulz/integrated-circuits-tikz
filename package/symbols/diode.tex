@@ -1,0 +1,91 @@
+\newif\if@circuits@diode@lightemitting
+\newif\if@circuits@diode@lightreceiving
+\tikzset{
+    circuits/diode/width/.initial = 0.35cm,
+    circuits/diode/head height/.initial = 0.3cm,
+    circuits/diode/terminal extension/.initial = 5pt,
+    circuits/diode/light emitting/.is if=@circuits@diode@lightemitting,
+    circuits/diode/light receiving/.is if=@circuits@diode@lightreceiving,
+    diode/.style = {diodeshape}
+}
+
+\pgfdeclareshape{diodeshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/diode/width}}
+    \saveddimen{\headheight}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/diode/head height}}
+    \saveddimen{\extension}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/diode/terminal extension}}
+    \anchor{port}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-\footheight}}
+    }
+    \anchor{center}{\pgfpointorigin}
+    \anchor{head center}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{0.5 * \headheight}}
+    }
+    \anchor{north}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{\headheight}}
+    }
+    \anchor{south}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-\footheight}}
+    }
+    \anchor{south east}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{-\footheight}}
+    }
+    \anchor{south west}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-\footheight}}
+    }
+    \anchor{north east}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{\headheight}}
+    }
+    \anchor{north west}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{\headheight}}
+    }
+    \anchor{west}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{0cm}}
+    }
+    \anchor{east}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{0cm}}
+    }
+    \beforebackgroundpath{
+        % head triangle
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0pt}{-0.5 * \headheight}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{0.5 * \headheight}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{0.5 * \headheight}}}
+        \pgfpathclose
+        \pgfusepath{stroke}
+        % head line
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \headheight -0.5pt}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{-0.5 * \headheight -0.5pt}}}
+        \pgfpathclose
+        \pgfusepath{stroke}
+        % draw extension
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0pt}{-0.5 * \headheight}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0pt}{-0.5 * \headheight - \extension}}}
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0pt}{ 0.5 * \headheight}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0pt}{ 0.5 * \headheight + \extension}}}
+        \pgfpathclose
+        \pgfusepath{stroke}
+        \if@circuits@diode@lightemitting
+            \pgfsetarrows{-{Stealth[length=2pt, width=2pt]}}
+            \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.6 * \width}{0.15 * \headheight}}}
+            \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.6 * \width + 5pt}{0.15 * \headheight + 3pt}}}
+            \pgfusepath{stroke}
+            \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.6 * \width}{0.15 * \headheight + 2pt}}}
+            \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.6 * \width + 5pt}{0.15 * \headheight + 2pt + 3pt}}}
+            \pgfusepath{stroke}
+            \pgfsetarrowsend{}
+        \fi
+        \if@circuits@diode@lightreceiving
+            \pgfsetarrows{-{Stealth[length=2pt, width=2pt]}}
+            \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.6 * \width + 5pt}{0.15 * \headheight + 3pt}}}
+            \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.6 * \width}{0.15 * \headheight}}}
+            \pgfusepath{stroke}
+            \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.6 * \width + 5pt}{0.15 * \headheight + 2pt + 3pt}}}
+            \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.6 * \width}{0.15 * \headheight + 2pt}}}
+            \pgfusepath{stroke}
+            \pgfsetarrowsend{}
+        \fi
+    }
+}
+
+% vim: ft=plaintex nowrap

@@ -1,0 +1,38 @@
+\tikzset{
+    circuits/oscillator/radius/.initial = 0.4cm,
+    circuits/oscillator/sine width factor/.initial = 0.7,
+    circuits/oscillator/sine height factor/.initial = 0.5,
+    oscillator/.style = {oscillatorshape}
+}
+
+\pgfdeclareshape{oscillatorshape}
+{
+    \saveddimen{\radius}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/oscillator/radius}}
+    \savedmacro{\sinewidthfactor}{\edef\sinewidthfactor{\pgfkeysvalueof{/tikz/circuits/oscillator/sine width factor}}}
+    \savedmacro{\sineheightfactor}{\edef\sineheightfactor{\pgfkeysvalueof{/tikz/circuits/oscillator/sine height factor}}}
+
+    % general anchors
+    \anchor{center}{\pgfpointorigin}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\radius}{0cm}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{\radius}{0cm}}}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ \radius}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-\radius}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ \radius}{-\radius}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\radius}{-\radius}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ \radius}{ \radius}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\radius}{ \radius}}}
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathcircle{\pgfpointorigin}{\radius}
+        \pgfusepath{stroke}
+        % draw sine
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-1 * \sinewidthfactor * \radius}{0.0 * \radius}}}
+        \pgfpathsine{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \sinewidthfactor * \radius}{\sineheightfactor * \radius}}}
+        \pgfpathcosine{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \sinewidthfactor * \radius}{-\sineheightfactor * \radius}}}
+        \pgfpathsine{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \sinewidthfactor * \radius}{-\sineheightfactor * \radius}}}
+        \pgfpathcosine{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \sinewidthfactor * \radius}{\sineheightfactor * \radius}}}
+        \pgfusepath{stroke}
+    }
+}
+
+% vim: ft=plaintex

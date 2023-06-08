@@ -1,0 +1,51 @@
+\tikzset{
+    andgate/.style = {nandgateshape, circuits/logic gate/is inverting = false, circuits/logic gate/dot radius = 0pt},
+    nandgate/.style = {nandgateshape, circuits/logic gate/is inverting = true}
+}
+
+\pgfdeclareshape{nandgateshape}
+{
+    \saveddimen{\width}{\pgfpointscale{\pgfkeysvalueof{/tikz/circuits/scale}}{\pgfpoint{\pgfkeysvalueof{/tikz/circuits/logic gate/width}}{0pt}}}
+    \saveddimen{\height}{\pgfpointscale{\pgfkeysvalueof{/tikz/circuits/scale}}{\pgfpoint{\pgfkeysvalueof{/tikz/circuits/logic gate/height}}{0pt}}}
+    \saveddimen{\dotradius}{\pgfpointscale{\pgfkeysvalueof{/tikz/circuits/scale}}{\pgfpoint{\pgfkeysvalueof{/tikz/circuits/logic gate/dot radius}}{0pt}}}
+    \savedmacro{\inputdistribution}{\renewcommand{\inputdistribution}[0]{\pgfkeysvalueof{/tikz/circuits/logic gate/input distribution factor}}}
+    \savedanchor{\output}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/scale} * \pgfkeysvalueof{/tikz/circuits/logic gate/width}}%
+            {0pt}
+        }%
+    }
+    % electrical terminals (anchors)
+    \anchor{in}{\pgfpoint{-\width/2}{0cm}}
+    \anchor{out}{\pgfpoint{0.5 * \width + 2 * \dotradius}{0pt}}
+    \anchor{in1}{\pgfpoint{-0.5 * \width}{0.5 * \height * \inputdistribution}}
+    \anchor{in2}{\pgfpoint{-0.5 * \width}{-0.5 * \height * \inputdistribution}}
+    % regular anchors
+    \anchor{center}{\pgfpointorigin}
+    \anchor{north}{\pgfpoint{0pt}{0.5 * \height}}
+    \anchor{south}{\pgfpoint{0pt}{-0.5 * \height}}
+    \anchor{west}{\pgfpoint{-0.5 * \width}{0pt}}
+    \anchor{east}{\pgfpoint{0.5 * \width}{0pt}}
+    \anchor{north east}{\pgfpoint{0.5 * \width}{0.5 * \height}}
+    \anchor{north west}{\pgfpoint{0.5 * \width}{-0.5 * \height}}
+    \anchor{south east}{\pgfpoint{-0.5 * \width}{0.5 * \height}}
+    \anchor{south west}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width - 0.5 * \height}{ 0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width - 0.5 * \height}{-0.5 * \height}}}
+        \pgfpatharc{-90}{90}{0.5 * \height}
+        \pgfpathclose
+        \pgfusepath{stroke}
+        \if@circuits@logicgate@isinverting
+            \pgfpathcircle{\pgfpointadd{\output}{\pgfpoint{0.5 * \dotradius + 1.5 * \pgfkeysvalueof{/tikz/circuits/line width}}{0pt}}}{\dotradius}
+            \pgfusepath{stroke}
+        \fi
+    }
+}
+
+% vim: ft=plaintex nowrap

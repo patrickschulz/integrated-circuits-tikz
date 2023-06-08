@@ -1,0 +1,56 @@
+\tikzset{
+    circuits/computer/width/.initial = 0.5cm,
+    circuits/computer/height/.initial = 1.2cm,
+    computer/.style = {computershape, draw, circuits/general}
+}
+
+\pgfdeclareshape{computershape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/computer/width}}
+    \saveddimen{\height}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/computer/height}}
+    \savedanchor{\centerpoint}{\pgfpointorigin}
+    % electrical anchors
+    % regular anchors
+    \anchor{text}
+    {
+        \pgfpoint{-0.5\wd\pgfnodeparttextbox}{-0.5\ht\pgfnodeparttextbox}
+    }
+    \anchor{center}{\centerpoint}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{ 0.5 * \height}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{-0.5 * \height}}}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.0 * \height}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.0 * \height}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{-0.5 * \height}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+    \anchorborder{
+        \@tempdima=\pgf@x
+        \@tempdimb=\pgf@y
+        \pgfpointborderrectangle{\pgfpoint{\@tempdima}{\@tempdimb}}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    }
+    \beforebackgroundpath{
+        \pgfpathrectanglecorners
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+        \pgfusepath{stroke}
+        \pgfpathrectanglecorners
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.4 * \width}{ 0.35 * \height}}}
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.4 * \width}{ 0.30 * \height}}}
+        \pgfusepath{fill}
+        \pgfpathrectanglecorners
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.4 * \width}{ 0.28 * \height}}}
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.4 * \width}{ 0.23 * \height}}}
+        \pgfusepath{fill}
+        \pgfpathcircle
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-0.1 * \height}}}
+            {1.25pt}
+        \pgfusepath{fill}
+        \pgfpathcircle
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-0.2 * \height}}}
+            {0.9pt}
+        \pgfusepath{fill}
+    }
+}
+
+% vim: ft=plaintex

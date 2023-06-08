@@ -1,0 +1,76 @@
+\newif\if@circuits@dff@negedge
+\newif\if@circuits@dff@drawNQ
+\tikzset{
+    circuits/dflipflop/width/.initial = 0.6cm,
+    circuits/dflipflop/height/.initial = 1.0cm,
+    circuits/dflipflop/trianglesize/.initial = 3pt,
+    circuits/dflipflop/dotradius/.initial = 2pt,
+    circuits/dflipflop/input distribution factor/.initial = 0.4,
+    circuits/dflipflop/draw NQ/.is if=@circuits@dff@drawNQ,
+    circuits/dflipflop/negative clock edge/.is if=@circuits@dff@negedge,
+    dflipflop/.style = {dflipflopshape}
+}
+
+\pgfdeclareshape{dflipflopshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/dflipflop/width}}
+    \saveddimen{\height}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/dflipflop/height}}
+    \saveddimen{\dotradius}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/dflipflop/dotradius}}
+    \saveddimen{\trianglesize}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/dflipflop/trianglesize}}
+    \savedmacro{\inputdistribution}{\renewcommand{\inputdistribution}[0]{\pgfkeysvalueof{/tikz/circuits/dflipflop/input distribution factor}}}
+    \savedanchor{\CLK}{%
+        \if@circuits@dff@negedge
+            \pgfpoint{-0.5 * \pgfkeysvalueof{/tikz/circuits/dflipflop/width} - 2 * \pgfkeysvalueof{/tikz/circuits/dflipflop/dotradius}}{-0.5 * \pgfkeysvalueof{/tikz/circuits/dflipflop/input distribution factor} * \pgfkeysvalueof{/tikz/circuits/dflipflop/height}}
+        \else
+            \pgfpoint{-0.5 * \pgfkeysvalueof{/tikz/circuits/dflipflop/width}}{-0.5 * \pgfkeysvalueof{/tikz/circuits/dflipflop/input distribution factor} * \pgfkeysvalueof{/tikz/circuits/dflipflop/height}}
+        \fi
+    }
+    % electrical terminals (anchors)
+    \anchor{D}{\pgfpoint{-0.5 * \width}{0.5 * \inputdistribution * \height}}
+    \deferredanchor{CLK}{\CLK}
+    \anchor{Q}{\pgfpoint{0.5 * \width}{0.5 * \inputdistribution * \height}}
+    \anchor{NQ}{\pgfpoint{0.5 * \width + 2 * \dotradius}{-0.5 * \inputdistribution * \height}}
+    % regular anchors
+    \anchor{text}
+    {
+        \pgfpoint{-0.5\wd\pgfnodeparttextbox}{-0.5\ht\pgfnodeparttextbox}
+    }
+    \anchor{center}{\pgfpointorigin}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{ 0.5 * \height}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{-0.5 * \height}}}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.0 * \height}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.0 * \height}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{-0.5 * \height}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+    \anchorborder{
+        \@tempdima=\pgf@x
+        \@tempdimb=\pgf@y
+        \pgfpointborderrectangle{\pgfpoint{\@tempdima}{\@tempdimb}}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    }
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathrectangle %
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{\width}{\height}}}
+        \pgfusepath{stroke}
+        % draw clk triangle
+        \pgfpathmoveto{\pgfpointadd{\pgfpoint{-0.5 * \width}{-0.5 * \inputdistribution * \height}}{\pgfpoint{0pt}{\trianglesize}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpoint{-0.5 * \width}{-0.5 * \inputdistribution * \height}}{\pgfpoint{\trianglesize}{0pt}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpoint{-0.5 * \width}{-0.5 * \inputdistribution * \height}}{\pgfpoint{0pt}{-\trianglesize}}}
+        \pgfusepath{stroke}
+        % draw clk circle
+        \if@circuits@dff@negedge
+            \pgfpathcircle{\pgfpoint{-0.5 * \width - \dotradius}{-0.5 * \inputdistribution * \height}}{\dotradius}
+            \pgfusepath{stroke}
+        \fi
+        % draw NQ circle
+        \if@circuits@dff@drawNQ
+            \pgfpathcircle{\pgfpoint{0.5 * \width + \dotradius}{-0.5 * \inputdistribution * \height}}{\dotradius}
+            \pgfusepath{stroke}
+        \fi
+    }
+}
+
+% vim: ft=plaintex nowrap

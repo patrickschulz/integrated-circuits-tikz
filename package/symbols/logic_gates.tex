@@ -1,0 +1,15 @@
+\newif\if@circuits@logicgate@isinverting
+\tikzset{
+    circuits/logic gate/width/.initial = 0.8cm,
+    circuits/logic gate/height/.initial = 0.8cm,
+    circuits/logic gate/dot radius/.initial = 3pt,
+    circuits/logic gate/input distribution factor/.initial = 0.6,
+    circuits/logic gate/output distribution factor/.initial = 0.8,
+    circuits/logic gate/is inverting/.is if=@circuits@logicgate@isinverting,
+}
+\input{package/symbols/orgate}
+\input{package/symbols/xorgate}
+\input{package/symbols/andgate}
+\input{package/symbols/notgate}
+
+% vim: ft=plaintex nowrap

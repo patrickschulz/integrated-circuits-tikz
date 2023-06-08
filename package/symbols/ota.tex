@@ -1,0 +1,161 @@
+\newif\ifotaflipinputs
+\newif\ifotaflipoutputs
+\newif\ifotafullydifferential
+\newif\ifotanopinlabels
+
+\tikzset{
+    circuits/ota/scale/.initial = 1,
+    circuits/ota/width/.initial = 2cm,
+    circuits/ota/input height/.initial = 2cm,
+    circuits/ota/output height/.initial = 1cm,
+    circuits/ota/input distribution factor/.initial = 0.6,
+    circuits/ota/output distribution factor/.initial = 0.8,
+    circuits/ota/pin fontsize/.initial = {\small},
+    circuits/ota/flip inputs/.is if=otaflipinputs,
+    circuits/ota/flip outputs/.is if=otaflipoutputs,
+    circuits/ota/fully differential/.is if=otafullydifferential,
+    circuits/ota/no pin labels/.is if=otanopinlabels,
+    ota/.style = {fdotashape, circuits/ota/fully differential=false},
+    fdota/.style = {fdotashape, circuits/ota/fully differential=true}
+}
+
+\pgfdeclareshape{fdotashape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/ota/width}}
+    \saveddimen{\inputheight}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/ota/input height}}
+    \saveddimen{\outputheight}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/ota/output height}}
+    \savedmacro{\inputdistribution}{\renewcommand{\inputdistribution}[0]{\pgfkeysvalueof{/tikz/circuits/ota/input distribution factor}}}
+    \savedmacro{\outputdistribution}{\renewcommand{\outputdistribution}[0]{\pgfkeysvalueof{/tikz/circuits/ota/output distribution factor}}}
+    \savedmacro{\scale}{\renewcommand{\scale}[0]{\pgfkeysvalueof{/tikz/circuits/ota/scale}}}
+    %\savedmacro{\pinfontsize}{\renewcommand{\pinfontsize}[0]{\pgfkeysvalueof{/tikz/circuits/ota/pin fontsize}}}
+    \savedanchor{\centerpoint}{\pgfpointorigin}
+    \savedanchor{\inputplus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/ota/width}}%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/ota/input height} * \pgfkeysvalueof{/tikz/circuits/ota/input distribution factor}}%
+        }%
+    }
+    \savedanchor{\inputminus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/ota/width}}%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/ota/input height} * \pgfkeysvalueof{/tikz/circuits/ota/input distribution factor}}%
+        }%
+    }
+    \savedanchor{\outputminus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/ota/width}}%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/ota/output height}}
+        }%
+    }
+    \savedanchor{\outputplus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/ota/width}}%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/ota/output height}}
+        }%
+    }
+    % electrical terminals (anchors)
+    \anchor{cmin}{\pgfpointadd{\centerpoint}{\pgfpoint{-\width/2}{0cm}}}
+    \anchor{cmout}{\pgfpointadd{\centerpoint}{\pgfpoint{\width/2}{0cm}}}
+    \anchor{+in}{\inputplus}
+    \anchor{-in}{\inputminus}
+    \anchor{in}{\pgfpointadd{\centerpoint}{\pgfpoint{-\width/2}{0cm}}}
+    \anchor{out}{
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {0.5 * \width}%
+            {0cm}
+        }%
+    }
+    \anchor{+out}{
+        \pgfpointlineattime%
+        {\outputdistribution}%
+        {\pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}}%
+        {\outputplus}%
+    }
+    \anchor{-out}{
+        \pgfpointlineattime%
+        {\outputdistribution}%
+        {\pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}}%
+        {\outputminus}%
+    }
+    \anchor{+power}{
+        \pgfpointlineattime%
+        {0.5}%
+        {\pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}}%
+        {\outputminus}
+    }
+    \anchor{-power}{
+        \pgfpointlineattime%
+        {0.5}%
+        {\pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}}%
+        {\outputplus}
+    }
+    % regular anchors
+    \anchor{center}{\centerpoint}
+    \anchor{text} % this is used to center the text in the node
+    {
+        %\pgfpoint{-.5\wd\pgfnodeparttextbox}{-.5\ht\pgfnodeparttextbox}
+        % the text node is shifted more than its width, a way of optical compensation (since the amplifier gets more narrow to the right)
+        \pgfpoint{-0.5\wd\pgfnodeparttextbox}{-0.5\ht\pgfnodeparttextbox}
+    }
+    \anchor{north}{
+        \pgfpointadd{\inputplus}{\pgfpoint{\width/2}{0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{south}{
+        \pgfpointadd{\inputminus}{\pgfpoint{\width/2}{-0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{west}{
+        \pgfpointadd{\centerpoint}{\pgfpoint{-0.5 * \width}{0pt}}
+    }
+    \anchor{east}{
+        \pgfpointadd{\centerpoint}{\pgfpoint{0.5 * \width}{0pt}}
+    }
+    \anchor{south west}{
+        \pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{north east}{
+        \pgfpointadd{\inputplus}{\pgfpoint{\width}{0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{south east}{
+        \pgfpointadd{\inputminus}{\pgfpoint{\width}{-0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathmoveto{\pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}}
+        \pgfpathlineto{\outputminus}
+        \pgfpathlineto{\outputplus}
+        \pgfpathlineto{\pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}}
+        \pgfpathclose
+        \pgfusepath{stroke}
+        \ifotanopinlabels
+        \else
+            \ifotaflipinputs
+                \pgftext[left, at={\inputplus}, x=2pt]{\pgfkeysvalueof{/tikz/circuits/ota/pin fontsize}$-$}
+                \pgftext[left, at={\inputminus}, x=2pt]{\pgfkeysvalueof{/tikz/circuits/ota/pin fontsize}$+$}
+            \else
+                \pgftext[left, at={\inputplus}, x=2pt]{\pgfkeysvalueof{/tikz/circuits/ota/pin fontsize}$+$}
+                \pgftext[left, at={\inputminus}, x=2pt]{\pgfkeysvalueof{/tikz/circuits/ota/pin fontsize}$-$}
+            \fi
+            \ifotafullydifferential
+                \ifotaflipoutputs
+                    \pgftext[at={\pgfpointlineattime{\outputdistribution}{\pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}}{\outputminus} }, x = -3pt, y=-6pt]{\pgfkeysvalueof{/tikz/circuits/ota/pin fontsize}$+$}
+                    \pgftext[at={\pgfpointlineattime{\outputdistribution}{\pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}}{\outputplus} }, x = -3pt, y=6pt]{\pgfkeysvalueof{/tikz/circuits/ota/pin fontsize}$-$}
+                \else
+                    \pgftext[at={\pgfpointlineattime{\outputdistribution}{\pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}}{\outputminus} }, x = -3pt, y=-6pt]{\pgfkeysvalueof{/tikz/circuits/ota/pin fontsize}$-$}
+                    \pgftext[at={\pgfpointlineattime{\outputdistribution}{\pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}}{\outputplus} }, x = -3pt, y=6pt]{\pgfkeysvalueof{/tikz/circuits/ota/pin fontsize}$+$}
+                \fi
+            \fi
+        \fi
+    }
+}
+
+% vim: ft=plaintex nowrap

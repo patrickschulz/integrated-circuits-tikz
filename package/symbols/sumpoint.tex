@@ -1,0 +1,53 @@
+\tikzset{
+    circuits/sumpoint/radius/.initial = 0.25cm,
+    sumpoint/.style = {sumpointshape}
+}
+
+\pgfdeclareshape{sumpointshape}
+{
+    \saveddimen{\radius}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/sumpoint/radius}}
+
+    % electrical anchors
+    \anchor{left}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\radius}{0cm}}}
+    \anchor{right}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{\radius}{0cm}}}
+    \anchor{top}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ \radius}}}
+    \anchor{bottom}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-\radius}}}
+    % general anchors
+    \anchor{center}{\pgfpointorigin}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\radius}{0cm}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{\radius}{0cm}}}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ \radius}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-\radius}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ \radius}{-\radius}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\radius}{-\radius}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ \radius}{ \radius}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\radius}{ \radius}}}
+    \anchorborder{
+        \pgf@xa=\pgf@x%
+        \pgf@ya=\pgf@y%
+        \edef\pgf@marshal{%
+            \noexpand\pgfpointborderellipse
+            {\noexpand\pgfqpoint{\the\pgf@xa}{\the\pgf@ya}}
+            {\noexpand\pgfqpoint{\radius}{\radius}}
+        }%
+        \pgf@marshal%
+        \pgf@xa=\pgf@x%
+        \pgf@ya=\pgf@y%
+        \pgfpointorigin%
+        \advance\pgf@x by\pgf@xa%
+        \advance\pgf@y by\pgf@ya%
+    }
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathcircle{\pgfpointorigin}{\radius}
+        \pgfusepath{stroke}
+        % draw plus sign
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \radius}{0cm}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \radius}{0cm}}}
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ 0.5 * \radius}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-0.5 * \radius}}}
+        \pgfusepath{stroke}
+    }
+}
+
+% vim: ft=plaintex

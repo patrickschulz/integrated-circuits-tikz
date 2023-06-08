@@ -1,0 +1,38 @@
+\tikzset{
+    circuits/mixer/radius/.initial = 0.35cm,
+    mixer/.style = {mixershape}
+}
+
+\pgfdeclareshape{mixershape}
+{
+    \saveddimen{\radius}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/mixer/radius}}
+
+    % electrical anchors
+    \anchor{left}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\radius}{0cm}}}
+    \anchor{right}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{\radius}{0cm}}}
+    \anchor{top}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ \radius}}}
+    \anchor{bottom}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-\radius}}}
+    % general anchors
+    \anchor{center}{\pgfpointorigin}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\radius}{0cm}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{\radius}{0cm}}}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ \radius}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-\radius}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ \radius}{-\radius}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\radius}{-\radius}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ \radius}{ \radius}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\radius}{ \radius}}}
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathcircle{\pgfpointorigin}{\radius}
+        \pgfusepath{stroke}
+        % draw cross
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.707107 * \radius}{-0.707107 * \radius}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.707107 * \radius}{ 0.707107 * \radius}}}
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.707107 * \radius}{ 0.707107 * \radius}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.707107 * \radius}{-0.707107 * \radius}}}
+        \pgfusepath{stroke}
+    }
+}
+
+% vim: ft=plaintex

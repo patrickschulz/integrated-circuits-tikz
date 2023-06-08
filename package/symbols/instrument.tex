@@ -1,0 +1,85 @@
+\tikzset{
+    circuits/instrument/width/.initial = 2cm,
+    circuits/instrument/height/.initial = 1.25cm,
+    circuits/instrument/screen width/.initial = 1.4cm,
+    circuits/instrument/screen height/.initial = 0.9cm,
+    circuits/instrument/screen xoffset/.initial = 2pt,
+    circuits/instrument/screen yoffset/.initial = 2pt,
+    circuits/instrument/port radius/.initial = 2pt,
+    circuits/instrument/grid x segments/.initial = 9,
+    circuits/instrument/grid y segments/.initial = 6,
+    instrument/.style = {instrumentshape, draw, circuits/general}
+}
+
+\pgfdeclareshape{instrumentshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/instrument/width}}
+    \saveddimen{\height}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/instrument/height}}
+    \saveddimen{\screenwidth}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/instrument/screen width}}
+    \saveddimen{\screenheight}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/instrument/screen height}}
+    \saveddimen{\screenxoffset}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/instrument/screen xoffset}}
+    \saveddimen{\screenyoffset}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/instrument/screen yoffset}}
+    \saveddimen{\portradius}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/instrument/port radius}}
+    \saveddimen\gridxstep{
+        \pgfmathsetlength\pgf@x{\pgfkeysvalueof{/tikz/circuits/instrument/screen width} / \pgfkeysvalueof{/tikz/circuits/instrument/grid x segments}}
+    }
+    \saveddimen\gridystep{
+        \pgfmathsetlength\pgf@x{\pgfkeysvalueof{/tikz/circuits/instrument/screen height} / \pgfkeysvalueof{/tikz/circuits/instrument/grid y segments}}
+    }
+    \savedanchor{\centerpoint}{\pgfpointorigin}
+    % electrical anchors
+    \anchor{port}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width - 2 * \portradius}{-0.5 * \height + 2 * \portradius}}}
+    % regular anchors
+    \anchor{text}
+    {
+        \pgfpoint{-0.5\wd\pgfnodeparttextbox}{-0.5\ht\pgfnodeparttextbox}
+    }
+    \anchor{center}{\centerpoint}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{ 0.5 * \height}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{-0.5 * \height}}}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.0 * \height}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.0 * \height}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{-0.5 * \height}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+    \anchorborder{
+        \@tempdima=\pgf@x
+        \@tempdimb=\pgf@y
+        \pgfpointborderrectangle{\pgfpoint{\@tempdima}{\@tempdimb}}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    }
+    \beforebackgroundpath{
+        % draw outer body
+        \pgfpathrectanglecorners
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+        % draw screen
+        \pgfpathrectangle
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width + \screenxoffset}{0.5 * \height - \screenyoffset}}}
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{\screenwidth}{-\screenheight}}}
+        \pgfusepath{stroke}
+        \pgfsetlinewidth{0.15pt}
+        \pgfpathgrid[step = \pgfpoint{\gridxstep}{\gridystep}]
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width + \screenxoffset}{0.5 * \height - \screenyoffset}}}
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width + \screenxoffset + \screenwidth}{0.5 * \height - \screenyoffset - \screenheight}}}
+        \pgfusepath{stroke}
+        % draw signal
+        \pgfsetlinewidth{0.8pt}
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width + \screenxoffset}{0.5 * \height - \screenyoffset - 0.8 * \screenheight}}}
+        \pgfpathcurveto
+            {\pgfpoint{-0.5 * \width + \screenxoffset + 0.5 * \screenwidth}{0.5 * \height - \screenyoffset - 0.8 * \screenheight}}
+            {\pgfpoint{-0.5 * \width + \screenxoffset + 0.5 * \screenwidth}{0.5 * \height - \screenyoffset - 0.7 * \screenheight}}
+            {\pgfpoint{-0.5 * \width + \screenxoffset + 0.5 * \screenwidth}{0.5 * \height - \screenyoffset - 0.2 * \screenheight}}
+        \pgfpathcurveto
+            {\pgfpoint{-0.5 * \width + \screenxoffset + 0.5 * \screenwidth}{0.5 * \height - \screenyoffset - 0.7 * \screenheight}}
+            {\pgfpoint{-0.5 * \width + \screenxoffset + 0.5 * \screenwidth}{0.5 * \height - \screenyoffset - 0.8 * \screenheight}}
+            {\pgfpoint{-0.5 * \width + \screenxoffset + 1.0 * \screenwidth}{0.5 * \height - \screenyoffset - 0.8 * \screenheight}}
+        \pgfusepath{stroke}
+        % draw port
+        \pgfpathcircle
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width - 2 * \portradius}{-0.5 * \height + 2 * \portradius}}}
+            {\portradius}
+    }
+}
+
+% vim: ft=plaintex

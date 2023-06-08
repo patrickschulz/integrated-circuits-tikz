@@ -1,0 +1,27 @@
+\pgfkeys{/pgf/.cd,
+  magnifying glass handle angle/.initial=-45,
+  magnifying glass handle aspect/.initial=1.5
+}
+\tikzset{
+    magglass/size/.initial = 35pt,
+    magglass/handle length/.initial = 10pt,
+    magglass/.style = {magglassshape, draw}
+}
+
+\pgfdeclareshape{magglassshape}
+{
+    \saveddimen{\size}{\pgf@x=\pgfkeysvalueof{/tikz/magglass/size}}
+    \saveddimen{\handlelength}{\pgf@x=\pgfkeysvalueof{/tikz/magglass/handle length}}
+    \savedanchor{\center}{\pgfpointorigin}
+    \anchor{center}{\center}
+    \beforebackgroundpath{
+        \pgfpathcircle{\pgfpointorigin}{0.5 * \size}
+    }
+    %\foregroundpath{
+    %    \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpointpolar{-45}{0.5 * \size}}}
+    %    \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpointpolar{-45}{0.5 * \size + \handlelength}}}
+    %    \pgfusepath{stroke}
+    %}
+}
+
+% vim: ft=plaintex

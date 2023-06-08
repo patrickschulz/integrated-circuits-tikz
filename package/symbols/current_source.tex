@@ -1,0 +1,46 @@
+\tikzset{
+    circuits/currentsource/radius/.initial = 0.25cm,
+    circuits/currentsource/extension factor/.initial = 1.0,
+    circuits/currentsource/terminal extension/.initial = 0cm,
+    circuits/currentsource/arrow length/.initial={1.75mm},
+    circuits/currentsource/arrow width/.initial={1.75mm},
+    currentsource/.style = {currentsourceshape}
+}
+
+\pgfdeclareshape{currentsourceshape}
+{
+    \saveddimen{\radius}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/currentsource/radius}}
+    \saveddimen{\extension}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/currentsource/terminal extension}}
+    \savedmacro{\extensionfactor}{\edef\extensionfactor{\pgfkeysvalueof{/tikz/circuits/currentsource/extension factor}}}
+
+    % general anchors
+    \anchor{center}{\pgfpointorigin}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\radius}{0cm}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{\radius}{0cm}}}
+    \anchor{outer north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ \radius * (1 + \extensionfactor)}}}
+    \anchor{outer south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-\radius * (1 + \extensionfactor)}}}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ \radius + \extension}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-\radius - \extension}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ \radius + \extension}{-\radius}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\radius - \extension}{-\radius}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ \radius + \extension}{ \radius}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\radius - \extension}{ \radius}}}
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathcircle{\pgfpointorigin}{\radius}
+        \pgfusepath{stroke}
+        % draw terminals
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-\radius - \extension}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-\radius}}}
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ \radius + \extension}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ \radius}}}
+        \pgfusepath{stroke}
+        % draw arrow
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{0.7 * \radius}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-0.7 * \radius}}}
+        \pgfsetarrows{-{Stealth[length=\pgfkeysvalueof{/tikz/circuits/currentsource/arrow length}, width=\pgfkeysvalueof{/tikz/circuits/currentsource/arrow width}]}}
+        \pgfusepath{stroke}
+    }
+}
+
+% vim: ft=plaintex

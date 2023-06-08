@@ -1,0 +1,56 @@
+\newif\ifgyratordrawarrow
+
+\tikzset{
+    circuits/gyrator/inner width/.initial = 1.25cm,
+    circuits/gyrator/outer width/.initial = 0.75cm,
+    circuits/gyrator/height/.initial = 2cm,
+    circuits/gyrator/radius/.initial = 1.00cm,
+    circuits/gyrator/draw arrow/.is if=gyratordrawarrow,
+    gyrator/.style = {gyratorshape}
+}
+
+\pgfdeclareshape{gyratorshape}
+{
+    \saveddimen{\innerwidth}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/gyrator/inner width}}
+    \saveddimen{\outerwidth}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/gyrator/outer width}}
+    \saveddimen{\height}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/gyrator/height}}
+    \saveddimen{\radius}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/gyrator/radius}}
+    \anchor{center}{\pgfpointorigin}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ 0.5 * \height}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-0.5 * \height}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \innerwidth + \outerwidth}{0cm}}}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \innerwidth - \outerwidth}{0cm}}}
+    \anchor{left in upper}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \innerwidth - \outerwidth}{ 0.5 * \height}}}
+    \anchor{left in lower}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \innerwidth - \outerwidth}{-0.5 * \height}}}
+    \anchor{right in upper}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \innerwidth + \outerwidth}{ 0.5 * \height}}}
+    \anchor{right in lower}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \innerwidth + \outerwidth}{-0.5 * \height}}}
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \innerwidth - 1 * \outerwidth}{ 0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \innerwidth - 0 * \outerwidth}{ 0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \innerwidth - 0 * \outerwidth}{-0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \innerwidth - 1 * \outerwidth}{-0.5 * \height}}}
+        \pgfusepath{stroke}
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \innerwidth + 1 * \outerwidth}{ 0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \innerwidth + 0 * \outerwidth}{ 0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \innerwidth + 0 * \outerwidth}{-0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \innerwidth + 1 * \outerwidth}{-0.5 * \height}}}
+        \pgfusepath{stroke}
+        % draw circle
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \innerwidth}{0.5 * \radius}}}
+        \pgfpatharc{90}{270}{0.5 * \radius}
+        \pgfusepath{stroke}
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \innerwidth}{0.5 * \radius}}}
+        \pgfpatharc{90}{-90}{0.5 * \radius}
+        \pgfusepath{stroke}
+        % draw arrow
+        \ifgyratordrawarrow
+            \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.4 * \innerwidth}{0.5 * \height}}}
+            \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.4 * \innerwidth}{0.5 * \height}}}
+            \pgfsetarrows{-{Stealth}}
+            \pgfusepath{stroke}
+        \fi
+    }
+}
+
+% vim: ft=plaintex nowrap

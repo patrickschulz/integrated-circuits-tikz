@@ -1,0 +1,89 @@
+\tikzset{
+    circuits/counter/width/.initial = 1.3cm,
+    circuits/counter/height/.initial = 0.8cm,
+    circuits/counter/trianglesize/.initial = 3pt,
+    counter/.style = {countershape}
+}
+
+\pgfdeclareshape{countershape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/counter/width}}
+    \saveddimen{\height}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/counter/height}}
+    \saveddimen{\dotradius}{\pgf@x=2pt}
+    \saveddimen{\trianglesize}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/counter/trianglesize}}
+    \savedanchor{\count}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/counter/width}}%
+            {0.15 * \pgfkeysvalueof{/tikz/circuits/counter/height}}
+        }%
+    }
+    \savedanchor{\reset}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/counter/width}}%
+            {-0.15 * \pgfkeysvalueof{/tikz/circuits/counter/height}}
+        }%
+    }
+    \savedanchor{\Q}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/counter/width}}%
+            {0.15 * \pgfkeysvalueof{/tikz/circuits/counter/height}}
+        }%
+    }
+    \savedanchor{\NQ}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/counter/width}}%
+            {-0.15 * \pgfkeysvalueof{/tikz/circuits/counter/height}}
+        }%
+    }
+    % electrical terminals (anchors)
+    \anchor{reset}{\pgfpoint{-0.5 * \width - 2 * \dotradius}{-0.15 * \height}}
+    \anchor{count}{\count}
+    \anchor{Q}{\Q}
+    \anchor{NQ}{\pgfpointadd{\NQ}{\pgfpoint{2 * \dotradius}{0pt}}}
+    % regular anchors
+    \anchor{text}
+    {
+        \pgfpoint{-0.5\wd\pgfnodeparttextbox}{-0.5\ht\pgfnodeparttextbox}
+    }
+    \anchor{center}{\pgfpointorigin}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{ 0.5 * \height}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{-0.5 * \height}}}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.0 * \height}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.0 * \height}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{-0.5 * \height}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+    \anchorborder{
+        \@tempdima=\pgf@x
+        \@tempdimb=\pgf@y
+        \pgfpointborderrectangle{\pgfpoint{\@tempdima}{\@tempdimb}}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    }
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathrectangle %
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{\width}{\height}}}
+        \pgfusepath{stroke}
+        % draw clk triangle
+        \pgfpathmoveto{\pgfpointadd{\count}{\pgfpoint{0pt}{\trianglesize}}}
+        \pgfpathlineto{\pgfpointadd{\count}{\pgfpoint{\trianglesize}{0pt}}}
+        \pgfpathlineto{\pgfpointadd{\count}{\pgfpoint{0pt}{-\trianglesize}}}
+        \pgfusepath{stroke}
+        % draw reset circle
+        \if@circuits@sequentiallogic@drawreset
+            \pgfpathcircle{\pgfpoint{-0.5 * \width - \dotradius}{-0.15 * \height}}{\dotradius}
+            \pgfusepath{stroke}
+        \fi
+    }
+}
+
+% vim: ft=plaintex nowrap

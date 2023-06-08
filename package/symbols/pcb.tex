@@ -1,0 +1,118 @@
+\tikzset{
+    circuits/pcb/width/.initial = 0.7cm,
+    circuits/pcb/height/.initial = 0.6cm,
+    circuits/pcb/chip size/.initial = 0.15cm,
+    circuits/pcb/chip pins/.initial = 4,
+    circuits/pcb/chip pin length/.initial = 1pt,
+    circuits/pcb/out pins/.initial = 3,
+    circuits/pcb/pin width/.initial = 2pt,
+    circuits/pcb/pin height/.initial = 2pt,
+    pcb/.style = {pcbshape, draw, circuits/general}
+}
+
+\pgfdeclareshape{pcbshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/pcb/width}}
+    \saveddimen{\height}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/pcb/height}}
+    \saveddimen{\chipsize}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/pcb/chip size}}
+    \savedmacro{\chippins}{\renewcommand{\chippins}[0]{\pgfkeysvalueof{/tikz/circuits/pcb/chip pins}}}
+    \saveddimen{\chippinlength}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/pcb/chip pin length}}
+    \saveddimen{\chippinpitch}{
+        \pgfmathsetlength\pgf@x{\pgfkeysvalueof{/tikz/circuits/pcb/chip size} / (\pgfkeysvalueof{/tikz/circuits/pcb/chip pins} + 1)}
+    }
+    \savedmacro{\pins}{\renewcommand{\pins}[0]{\pgfkeysvalueof{/tikz/circuits/pcb/out pins}}}
+    \saveddimen{\pinpitch}{
+        \pgfmathsetlength\pgf@x{\pgfkeysvalueof{/tikz/circuits/pcb/height} / (\pgfkeysvalueof{/tikz/circuits/pcb/out pins} + 2)}
+    }
+    \saveddimen{\pinwidth}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/pcb/pin width}}
+    \saveddimen{\pinheight}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/pcb/pin height}}
+    \savedanchor{\centerpoint}{\pgfpointorigin}
+    % electrical anchors
+    % regular anchors
+    \anchor{text}
+    {
+        \pgfpoint{-0.5\wd\pgfnodeparttextbox}{-0.5\ht\pgfnodeparttextbox}
+    }
+    \anchor{center}{\centerpoint}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{ 0.5 * \height}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{-0.5 * \height}}}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.0 * \height}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.0 * \height}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{-0.5 * \height}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+    \anchorborder{
+        \@tempdima=\pgf@x
+        \@tempdimb=\pgf@y
+        \pgfpointborderrectangle{\pgfpoint{\@tempdima}{\@tempdimb}}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    }
+    \beforebackgroundpath{
+        \pgfsetcornersarced{\pgfpoint{1pt}{1pt}}
+        % draw pcb body
+        \pgfpathrectanglecorners
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+        \pgfusepath{stroke}
+        % draw chip
+        \pgfsetcornersarced{\pgfpointorigin}
+        \pgfpathrectangle
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \chipsize}{-0.5 * \chipsize}}}
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{\chipsize}{\chipsize}}}
+        \pgfusepath{fill}
+        % draw chip pins
+        \foreach \i in {1, 2, ..., \chippins}
+        {
+            \pgfsetlinewidth{0.3pt}
+            \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{(\i - 0.5 * (\chippins + 1)) * \chippinpitch}{0.5 * \chipsize}}}
+            \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{(\i - 0.5 * (\chippins + 1)) * \chippinpitch}{0.5 * \chipsize + \chippinlength}}}
+            \pgfusepath{stroke}
+            \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{(\i - 0.5 * (\chippins + 1)) * \chippinpitch}{-0.5 * \chipsize}}}
+            \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{(\i - 0.5 * (\chippins + 1)) * \chippinpitch}{-0.5 * \chipsize - \chippinlength}}}
+            \pgfusepath{stroke}
+            \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \chipsize}{(\i - 0.5 * (\chippins + 1)) * \chippinpitch}}}
+            \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \chipsize + \chippinlength}{(\i - 0.5 * (\chippins + 1)) * \chippinpitch}}}
+            \pgfusepath{stroke}
+            \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \chipsize}{(\i - 0.5 * (\chippins + 1)) * \chippinpitch}}}
+            \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \chipsize - \chippinlength}{(\i - 0.5 * (\chippins + 1)) * \chippinpitch}}}
+            \pgfusepath{stroke}
+        }
+        % draw mounting holes
+        \foreach \x in {-1, 1}
+        {
+            \foreach \y in {-1, 1}
+            {
+                \pgfpathcircle{\pgfpointadd{\pgfpointorigin}{\pgfpoint{\x * 0.4 * \width}{\y * 0.4 * \height}}}{0.6pt}
+                \pgfusepath{fill}
+            }
+        }
+        \foreach \y in {1, 2, ..., \pins}
+        {
+            \pgfpathrectangle
+                {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{(\y - 0.5 * (\pins + 1)) * \pinpitch - 0.5 * \pinheight}}}
+                {\pgfpointadd{\pgfpointorigin}{\pgfpoint{\pinwidth}{\pinheight}}}
+            \pgfusepath{fill}
+        }
+    }
+    % \pgf@sh@s@pcbshape contains all the code for the pcb shape
+    % and is executed just before a pcb node is drawn.
+    \pgfutil@g@addto@macro\pgf@sh@s@pcbshape{%
+        % Start with the maximum pin number and go backwards.
+        % If the anchor is undefined, create it. Otherwise stop.
+        \c@pgf@counta=\pgfkeysvalueof{/tikz/circuits/pcb/out pins}\relax%
+        \pgfmathloop%
+        \ifnum\c@pgf@counta>0\relax%
+            \pgfutil@ifundefined{pgf@anchor@pcbshape@out\space\the\c@pgf@counta}{%
+                \expandafter\xdef\csname pgf@anchor@pcbshape@out\space\the\c@pgf@counta\endcsname{%
+                    \noexpand\pcbpinanchor{\the\c@pgf@counta}%
+                }%
+            }{\c@pgf@counta=0\relax}%
+            \advance\c@pgf@counta-1\relax%
+        \repeatpgfmathloop%  
+    }%
+}
+\def\pcbpinanchor#1{%
+    \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{(#1 - 0.5 * (\pins + 1)) * \pinpitch}}
+}
+
+% vim: ft=plaintex

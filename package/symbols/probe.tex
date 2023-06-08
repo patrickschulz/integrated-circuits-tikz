@@ -1,0 +1,156 @@
+\tikzset{
+    circuits/probe/width/.initial = 25pt,
+    circuits/probe/offset/.initial = 0.15cm,
+    circuits/probe/pad pitch/.initial = 0.2cm,
+    circuits/probe/needles/.initial = 3,
+    circuits/probe/needle width/.initial = 3pt,
+    circuits/probe/needle length/.initial = 10pt,
+    circuits/probe/ports/.initial = 1,
+    circuits/probe/port width/.initial = 2.5pt,
+    circuits/probe/port height/.initial = 2.5pt,
+    circuits/probe/port pitch/.initial = 0.2cm,
+    probe/.style = {probeshape, draw, circuits/general}
+}
+
+\pgfdeclareshape{probeshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/probe/width}}
+    \saveddimen\height{
+        \pgfmathsetlength\pgf@x{(\pgfkeysvalueof{/tikz/circuits/probe/needles} + 1) * \pgfkeysvalueof{/tikz/circuits/probe/pad pitch} + \pgfkeysvalueof{/tikz/circuits/probe/offset}}%
+    }
+    \saveddimen{\offset}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/probe/offset}}
+    \saveddimen{\padpitch}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/probe/pad pitch}}
+    \saveddimen{\portpitch}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/probe/port pitch}}
+    \savedmacro{\needles}{\renewcommand{\needles}[0]{\pgfkeysvalueof{/tikz/circuits/probe/needles}}}
+    \saveddimen{\needlewidth}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/probe/needle width}}
+    \saveddimen{\needlelength}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/probe/needle length}}
+    \savedmacro{\ports}{\renewcommand{\ports}[0]{\pgfkeysvalueof{/tikz/circuits/probe/ports}}}
+    \saveddimen{\portwidth}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/probe/port width}}
+    \saveddimen{\portheight}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/probe/port height}}
+    \savedanchor{\centerpoint}{\pgfpointorigin}
+    % electrical anchors
+    \anchor{midneedle}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width - \needlelength}{0cm}}}
+    % regular anchors
+    \anchor{text}
+    {
+        \pgfpoint{-0.5\wd\pgfnodeparttextbox}{-0.5\ht\pgfnodeparttextbox}
+    }
+    \anchor{center}{\centerpoint}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{ 0.5 * \height}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{-0.5 * \height}}}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.0 * \height}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.0 * \height}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{-0.5 * \height}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+    \anchorborder{
+        \@tempdima=\pgf@x
+        \@tempdimb=\pgf@y
+        \pgfpointborderrectangle{\pgfpoint{\@tempdima}{\@tempdimb}}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{0.5 * \height}}}
+    }
+    \beforebackgroundpath{%
+        % draw body
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{0cm}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{-0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width + \offset}{-0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height + \offset}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.5 * \height - \offset}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width + \offset}{ 0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{0cm}}}
+%
+        %\pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width + \offset + \width}{0cm}}}
+        %\pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width + \offset + \width}{-0.5 * \height - \offset}}}
+        %\pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width + \offset}{-0.5 * \height - \offset}}}
+        %\pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+        %\pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{0.5 * \height}}}
+        %\pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width + \offset}{0.5 * \height + \offset}}}
+        %\pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width + \offset + \width}{0.5 * \height + \offset}}}
+        %\pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width + \offset + \width}{0cm}}}
+        \pgfusepath{stroke}
+        % draw needles
+        \pgfsetbeveljoin
+        \foreach \y in {1, ..., \needles}
+        {
+            \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{(\y - 0.5 * (\needles + 1)) * \padpitch + 0.5 * \needlewidth}}}
+            \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width - \needlelength}{(\y - 0.5 * (\needles + 1)) * \padpitch}}}
+            \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{(\y - 0.5 * (\needles + 1)) * \padpitch - 0.5 * \needlewidth}}}
+            \pgfusepath{stroke, fill}
+        }
+        % draw ports
+        \foreach \y in {1, ..., \ports}
+        {
+            \pgfpathrectangle
+                {\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width - 0.5 * \portwidth}{(\y - 0.5 * (\ports + 1)) * \portpitch - 0.5 * \portheight}}}
+                {\pgfpointadd{\pgfpointorigin}{\pgfpoint{\portwidth}{\portheight}}}
+            \pgfusepath{fill}
+        }
+    }
+    % \pgf@sh@s@probe contains all the code for the probe shape
+    % and is executed just before a probe node is drawn.
+    \pgfutil@g@addto@macro\pgf@sh@s@probeshape{%
+        % Start with the maximum pin number and go backwards.
+        % If the anchor is undefined, create it. Otherwise stop.
+        \c@pgf@counta=\pgfkeysvalueof{/tikz/circuits/probe/ports}\relax%
+        \pgfmathloop%
+        \ifnum\c@pgf@counta>0\relax%
+            \pgfutil@ifundefined{pgf@anchor@probeshape@port\space\the\c@pgf@counta}{%
+                \expandafter\xdef\csname pgf@anchor@probeshape@port\space\the\c@pgf@counta\endcsname{%
+                    \noexpand\probeportanchor{\the\c@pgf@counta}%
+                }%
+            }{\c@pgf@counta=0\relax}%
+            \advance\c@pgf@counta-1\relax%
+        \repeatpgfmathloop%  
+    }%
+    % \pgf@sh@s@probe contains all the code for the probe shape
+    % and is executed just before a probe node is drawn.
+    \pgfutil@g@addto@macro\pgf@sh@s@probeshape{%
+        % Start with the maximum pin number and go backwards.
+        % If the anchor is undefined, create it. Otherwise stop.
+        \c@pgf@counta=\pgfkeysvalueof{/tikz/circuits/probe/needles}\relax%
+        \pgfmathloop%
+        \ifnum\c@pgf@counta>0\relax%
+            \pgfutil@ifundefined{pgf@anchor@probeshape@needle\space\the\c@pgf@counta}{%
+                \expandafter\xdef\csname pgf@anchor@probeshape@needle\space\the\c@pgf@counta\endcsname{%
+                    \noexpand\probeneedleanchor{\the\c@pgf@counta}%
+                }%
+            }{\c@pgf@counta=0\relax}%
+            \advance\c@pgf@counta-1\relax%
+        \repeatpgfmathloop%  
+    }%
+    % \pgf@sh@s@probe contains all the code for the probe shape
+    % and is executed just before a probe node is drawn.
+    \pgfutil@g@addto@macro\pgf@sh@s@probeshape{%
+        % Start with the maximum pin number and go backwards.
+        % If the anchor is undefined, create it. Otherwise stop.
+        \c@pgf@counta=\pgfkeysvalueof{/tikz/circuits/probe/needles}\relax%
+        \pgfmathloop%
+        \ifnum\c@pgf@counta>0\relax%
+            \pgfutil@ifundefined{pgf@anchor@probeshape@innerport\space\the\c@pgf@counta}{%
+                \expandafter\xdef\csname pgf@anchor@probeshape@innerport\space\the\c@pgf@counta\endcsname{%
+                    \noexpand\probeinnerportanchor{\the\c@pgf@counta}%
+                }%
+            }{\c@pgf@counta=0\relax}%
+            \advance\c@pgf@counta-1\relax%
+        \repeatpgfmathloop%  
+    }%
+}
+
+\def\probeportanchor#1{%
+    % When this macro is called,
+    % \width, \needlelength, \pins and \portpitch will be defined
+    \pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{(#1 - 0.5 * (\ports + 1)) * \portpitch}}
+}
+\def\probeinnerportanchor#1{%
+    % When this macro is called,
+    % \width, \needlelength, \pins and \portpitch will be defined
+    \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{(#1 - 0.5 * (\needles + 1)) * \padpitch}}
+}
+\def\probeneedleanchor#1{%
+    % When this macro is called,
+    % \width, \needlelength, \pins and \padpitch will be defined
+    \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width - \needlelength}{(#1 - 0.5 * (\needles + 1)) * \padpitch}}
+}
+
+% vim: ft=plaintex

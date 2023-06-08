@@ -1,0 +1,136 @@
+\newif\ifopampflipinputs
+\newif\ifopampflipoutputs
+\newif\ifopampfullydifferential
+\newif\if@opamp@draw@input@labels
+\newif\if@opamp@draw@output@labels
+
+\tikzset{
+    circuits/opamp/width/.initial = 2cm,
+    circuits/opamp/height/.initial = 2cm,
+    circuits/opamp/input distribution factor/.initial = 0.6,
+    circuits/opamp/output distribution factor/.initial = 0.6,
+    circuits/opamp/pin fontsize/.initial = {\tiny},
+    circuits/opamp/flip inputs/.is if=opampflipinputs,
+    circuits/opamp/flip outputs/.is if=opampflipoutputs,
+    circuits/opamp/fully differential/.is if=opampfullydifferential,
+    circuits/opamp/draw input lables/.is if=@opamp@draw@input@labels,
+    circuits/opamp/draw output lables/.is if=@opamp@draw@output@labels,
+    opamp/.style = {fdopampshape, circuits/opamp/fully differential=false},
+    fdopamp/.style = {fdopampshape, circuits/opamp/fully differential=true}
+}
+
+\pgfdeclareshape{fdopampshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/opamp/width}}
+    \saveddimen{\inputheight}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/opamp/height}}
+    \savedmacro{\inputdistribution}{\renewcommand{\inputdistribution}[0]{\pgfkeysvalueof{/tikz/circuits/opamp/input distribution factor}}}
+    \savedmacro{\outputdistribution}{\renewcommand{\outputdistribution}[0]{\pgfkeysvalueof{/tikz/circuits/opamp/output distribution factor}}}
+    \savedanchor{\centerpoint}{\pgfpointorigin}
+    \savedanchor{\inputplus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/opamp/width}}%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/opamp/height} * \pgfkeysvalueof{/tikz/circuits/opamp/input distribution factor}}%
+        }%
+    }
+    \savedanchor{\inputminus}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/opamp/width}}%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/opamp/height} * \pgfkeysvalueof{/tikz/circuits/opamp/input distribution factor}}%
+        }%
+    }
+    \savedanchor{\output}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/opamp/width}}%
+            {0cm}
+        }%
+    }
+    % electrical terminals (anchors)
+    \anchor{cmin}{\pgfpointadd{\centerpoint}{\pgfpoint{-\width/2}{0cm}}}
+    \anchor{cmout}{\output}
+    \anchor{out}{\output}
+    \anchor{+in}{\inputplus}
+    \anchor{-in}{\inputminus}
+    \anchor{+out}{
+        \pgfpointlineattime%
+        {\outputdistribution}%
+        {\pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}}%
+        {\output}%
+    }
+    \anchor{-out}{
+        \pgfpointlineattime%
+        {\outputdistribution}%
+        {\pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}}%
+        {\output}%
+    }
+    \anchor{+power}{
+        \pgfpointlineattime%
+        {0.5}%
+        {\pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}}%
+        {\output}%
+    }
+    \anchor{-power}{
+        \pgfpointlineattime%
+        {0.5}%
+        {\pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}}%
+        {\output}%
+    }
+
+    % regular anchors
+    \anchor{center}{\centerpoint}
+    \anchor{west}{\pgfpointadd{\centerpoint}{\pgfpoint{-\width/2}{0cm}}}
+    \anchor{east}{\output}
+    \anchor{north}{
+        \pgfpointadd{\inputplus}{\pgfpoint{\width/2}{0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{south}{
+        \pgfpointadd{\inputminus}{\pgfpoint{\width/2}{-0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{north west}{
+        \pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{south west}{
+        \pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{north east}{
+        \pgfpointadd{\inputplus}{\pgfpoint{\width}{0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \anchor{south east}{
+        \pgfpointadd{\inputminus}{\pgfpoint{\width}{-0.5 * \inputheight * (1 - \inputdistribution)}}
+    }
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathmoveto{\pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}}
+        \pgfpathlineto{\output}
+        \pgfpathlineto{\pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}}
+        \pgfpathclose
+        \pgfusepath{stroke}
+        \if@opamp@draw@input@labels
+            \ifopampflipinputs
+                \pgftext[left, at={\inputplus}, x=2pt]{\tiny$-$}
+                \pgftext[left, at={\inputminus}, x=2pt]{\tiny$+$}
+            \else
+                \pgftext[left, at={\inputplus}, x=2pt]{\tiny$+$}
+                \pgftext[left, at={\inputminus}, x=2pt]{\tiny$-$}
+            \fi
+        \fi
+        \if@opamp@draw@output@labels
+            \ifopampfullydifferential
+                \ifopampflipoutputs
+                    \pgftext[at={\pgfpointlineattime{\outputdistribution}{\pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}}{\output} }, x = -3pt, y=-3pt]{\tiny$+$}
+                    \pgftext[at={\pgfpointlineattime{\outputdistribution}{\pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}}{\output} }, x = -3pt, y=3pt]{\tiny$-$}
+                \else
+                    \pgftext[at={\pgfpointlineattime{\outputdistribution}{\pgfpointadd{\inputplus}{\pgfpoint{0cm}{0.5 * \inputheight * (1 - \inputdistribution)}}}{\output} }, x = -3pt, y=-3pt]{\tiny$-$}
+                    \pgftext[at={\pgfpointlineattime{\outputdistribution}{\pgfpointadd{\inputminus}{\pgfpoint{0cm}{-0.5 * \inputheight * (1 - \inputdistribution)}}}{\output} }, x = -3pt, y=3pt]{\tiny$+$}
+                \fi
+            \fi
+        \fi
+    }
+}
+
+% vim: ft=plaintex nowrap

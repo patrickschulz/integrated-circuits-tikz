@@ -1,0 +1,42 @@
+\tikzset{
+    circuits/impedance/width/.initial = 0.6cm,
+    circuits/impedance/height/.initial = 0.25cm,
+    circuits/impedance/segments/.initial = 3,
+    circuits/impedance/terminal extension/.initial = 0.05cm,
+    impedance/.style = {impedanceshape}
+}
+
+\pgfdeclareshape{impedanceshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/impedance/width}}
+    \saveddimen{\height}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/impedance/height}}
+    \savedanchor{\lowerleft}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \pgfkeysvalueof{/tikz/circuits/impedance/width}}{-0.5 * \pgfkeysvalueof{/tikz/circuits/impedance/height}}}
+    }
+    \savedanchor{\upperright}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \pgfkeysvalueof{/tikz/circuits/impedance/width}}{0.5 * \pgfkeysvalueof{/tikz/circuits/impedance/height}}}
+    }
+
+    % electrical terminals
+    \anchor{plus}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{0cm}}}
+    \anchor{minus}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{0cm}}}
+    % general anchors
+    \anchor{lowerleft}{\lowerleft}
+    \anchor{upperright}{\upperright}
+    \anchor{center}{\pgfpointorigin}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{0cm}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \width}{0cm}}}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{0.5 * \height}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{-0.5 * \height}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \height}{-0.5 * \width}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \height}{-0.5 * \width}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.5 * \height}{0.5 * \width}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \height}{0.5 * \width}}}
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathrectanglecorners{\lowerleft}{\upperright}
+        \pgfusepath{fill}
+    }
+}
+
+% vim: ft=plaintex

@@ -1,0 +1,72 @@
+\tikzset{
+    circuits/supply/width/.initial = 1.2cm,
+    circuits/supply/height/.initial = 0.8cm,
+    circuits/supply/ports/.initial = 3,
+    circuits/supply/port radius/.initial = 2pt,
+    supply/.style = {supplyshape, draw, circuits/general}
+}
+
+\pgfdeclareshape{supplyshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/supply/width}}
+    \saveddimen{\height}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/supply/height}}
+    \savedmacro{\ports}{\renewcommand{\ports}[0]{\pgfkeysvalueof{/tikz/circuits/supply/ports}}}
+    \saveddimen{\portradius}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/supply/port radius}}
+    \saveddimen{\portpitch}{
+        \pgfmathsetlength\pgf@x{\pgfkeysvalueof{/tikz/circuits/supply/width} / (\pgfkeysvalueof{/tikz/circuits/supply/ports})}
+    }
+    \savedanchor{\centerpoint}{\pgfpointorigin}
+    % regular anchors
+    \anchor{text}
+    {
+        \pgfpoint{-0.5\wd\pgfnodeparttextbox}{-0.5\ht\pgfnodeparttextbox}
+    }
+    \anchor{center}{\centerpoint}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{ 0.5 * \height}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0.0 * \width}{-0.5 * \height}}}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.0 * \height}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.0 * \height}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{-0.5 * \height}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{ 0.5 * \height}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+    \anchorborder{
+        \@tempdima=\pgf@x
+        \@tempdimb=\pgf@y
+        \pgfpointborderrectangle{\pgfpoint{\@tempdima}{\@tempdimb}}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+    }
+    \beforebackgroundpath{
+        \pgfpathrectanglecorners
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \width}{-0.5 * \height}}}
+            {\pgfpointadd{\pgfpointorigin}{\pgfpoint{ 0.5 * \width}{ 0.5 * \height}}}
+        \foreach \x in {1, 2, ..., \ports}
+        {
+            \pgfpathcircle
+                {\pgfpointadd{\pgfpointorigin}{\pgfpoint{(\x - 0.5 * (\ports + 1)) * \portpitch}{-0.5 * \height + 2 * \portradius}}}
+                {\portradius}
+            \pgfusepath{stroke}
+        }
+    }
+    % \pgf@sh@s@probe contains all the code for the probe shape
+    % and is executed just before a probe node is drawn.
+    \pgfutil@g@addto@macro\pgf@sh@s@supplyshape{%
+        % Start with the maximum pin number and go backwards.
+        % If the anchor is undefined, create it. Otherwise stop.
+        \c@pgf@counta=\pgfkeysvalueof{/tikz/circuits/supply/ports}\relax%
+        \pgfmathloop%
+        \ifnum\c@pgf@counta>0\relax%
+            \pgfutil@ifundefined{pgf@anchor@supplyshape@port\space\the\c@pgf@counta}{%
+                \expandafter\xdef\csname pgf@anchor@supplyshape@port\space\the\c@pgf@counta\endcsname{%
+                    \noexpand\supplyportanchor{\the\c@pgf@counta}%
+                }%
+            }{\c@pgf@counta=0\relax}%
+            \advance\c@pgf@counta-1\relax%
+        \repeatpgfmathloop%  
+    }%
+}
+
+\def\supplyportanchor#1{%
+    \pgfpointadd{\pgfpointorigin}{\pgfpoint{(#1 - 0.5 * (\ports + 1)) * \portpitch}{-0.5 * \height + 2 * \portradius}}
+}
+
+% vim: ft=plaintex

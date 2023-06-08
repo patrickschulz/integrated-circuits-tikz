@@ -1,0 +1,153 @@
+\documentclass{standalone}
+
+\usepackage{../package/integrated-circuits-tikz}
+
+\usepackage{siunitx}
+
+\newcommand{\voltagelabel}[1]{V_{\mathrm{#1}}}
+
+\definecolor{plotcolor1}{RGB}{230,25,75}
+\definecolor{plotcolor2}{RGB}{60,180,75}
+\definecolor{plotcolor3}{RGB}{255,225,25}
+\definecolor{plotcolor4}{RGB}{0,130,200}
+\definecolor{plotcolor5}{RGB}{245,130,48}
+
+\begin{document}
+    \begin{tikzpicture}
+        [
+            node distance = 0.5cm and 0.75cm,
+            circuits/mosfet/drain length = 0.25cm,
+            circuits/mosfet/source length = 0.25cm,
+            thickoxpmos/.style = {pmos, circuits/mosfet/gate line width = 2pt},
+            signalanno/.style = {line width = 0.6pt, x = 0.5pt, y = 4pt},
+            voltagelabel/.style = {font = \small, inner xsep = 0pt, inner ysep = 2pt},
+            trackhold1p/.pic = {
+                \draw[signalanno] (-12, 0) sin (-11, 1) cos(-10, 0) sin(-9, -1) cos(-8, 0) sin(-7, 1) cos(-6, 0) sin(-5, -1) cos(-4, 0) sin(-3, 1) cos(-2, 0) sin(-1, -1) cos(0, 0) -- (12, 0);
+            },
+            trackhold2p/.pic = {
+                \draw[signalanno] (-12, 0) -- (0, 0) sin (1, 1) cos(2, 0) sin(3, -1) cos(4, 0) sin(5, 1) cos(6, 0) sin(7, -1) cos(8, 0) sin(9, 1) cos(10, 0) sin(11, -1) cos(12, 0);
+            },
+            trackhold1n/.pic = {
+                \draw[signalanno] (-12, 0) sin (-11, -1) cos(-10, 0) sin(-9, 1) cos(-8, 0) sin(-7, -1) cos(-6, 0) sin(-5, 1) cos(-4, 0) sin(-3, -1) cos(-2, 0) sin(-1, 1) cos(0, 0) -- (12, 0);
+            },
+            trackhold2n/.pic = {
+                \draw[signalanno] (-12, 0) -- (0, 0) sin (1, -1) cos(2, 0) sin(3, 1) cos(4, 0) sin(5, -1) cos(6, 0) sin(7, 1) cos(8, 0) sin(9, -1) cos(10, 0) sin(11, 1) cos(12, 0);
+            },
+            clockp/.pic = {
+                \draw[signalanno] (-12, -0.5) -- (-12, 0.5) -- (0, 0.5) -- (0, -0.5) -- (12, -0.5) --(12, 0.5);
+            },
+            clockn/.pic = {
+                \draw[signalanno] (-12, 0.5) -- (-12, -0.5) -- (0, -0.5) -- (0, 0.5) -- (12, 0.5) --(12, -0.5);
+            },
+            clockoff/.pic = {
+                \draw[signalanno] (-12, 0.5) -- (12, 0.5);
+            }
+        ]
+        % input diff pair
+        \node[thickoxpmos] (M0) { };
+        \node[dot, below left = 0.2cm and 3.8cm of M0.drain] (inL) {};
+        \node[dot, below right = 0.2cm and 3.8cm of M0.drain] (inR) {};
+        \node[coordinate, left = 1.4cm of inL] (inL2) {};
+        \node[coordinate, right = 1.4cm of inL] (inL1) {};
+        \node[coordinate, left = 1.4cm of inR] (inR1) {};
+        \node[coordinate, right = 1.4cm of inR] (inR2) {};
+        \node[thickoxpmos, below left  = 0.7cm and 0.8cm of inL2, anchor = source] (Min2L) { };
+        \node[thickoxpmos, below right = 0.7cm and 0.8cm of inL2, anchor = source] (Min2Lx) { };
+        \node[thickoxpmos, below right = 0.7cm and 0.8cm of inL1, anchor = source, xmirror] (Min1L) { };
+        \node[thickoxpmos, below left  = 0.7cm and 0.8cm of inL1, anchor = source, xmirror] (Min1Lx) { };
+        \node[thickoxpmos, below left  = 0.7cm and 0.8cm of inR1, anchor = source] (Min1R) { };
+        \node[thickoxpmos, below right = 0.7cm and 0.8cm of inR1, anchor = source] (Min1Rx) { };
+        \node[thickoxpmos, below right = 0.7cm and 0.8cm of inR2, anchor = source, xmirror] (Min2R) { };
+        \node[thickoxpmos, below left  = 0.7cm and 0.8cm of inR2, anchor = source, xmirror] (Min2Rx) { };
+        \node[pmos, below = 0cm of Min1L.drain, anchor = source, xmirror] (Mclk1L) { };
+        \node[pmos, below = 0cm of Min1Lx.drain, anchor = source, xmirror] (Mclk1Lx) { };
+        \node[pmos, below = 0cm of Min2L.drain, anchor = source] (Mclk2L) { };
+        \node[pmos, below = 0cm of Min2Lx.drain, anchor = source] (Mclk2Lx) { };
+        \node[pmos, below = 0cm of Min1R.drain, anchor = source] (Mclk1R) { };
+        \node[pmos, below = 0cm of Min1Rx.drain, anchor = source] (Mclk1Rx) { };
+        \node[pmos, below = 0cm of Min2R.drain, anchor = source, xmirror] (Mclk2R) { };
+        \node[pmos, below = 0cm of Min2Rx.drain, anchor = source, xmirror] (Mclk2Rx) { };
+        \draw[wire] (Mclk1L.drain) -- node[dot] (sumL) {} (Mclk2L.drain);
+        \draw[wire] (Mclk1R.drain) -- node[dot] (sumR) {} (Mclk2R.drain);
+        \node[nmos, below = 0.3cm of sumL, anchor = drain, xmirror] (MdiodeL) { };
+        \node[nmos, below = 0.3cm of sumR, anchor = drain] (MdiodeR) { };
+        \node[vdd, label = {[voltagelabel, xshift = 4pt]above:{\qty{1.8}{\volt}}}] (vdd) at (M0.source) {};
+
+        % output
+        \node[nmos, right = 4.0cm of MdiodeR] (M3) { };
+        \node[nmos, right = 1.5cm of M3] (M4) { };
+        \node[pmos, xmirror, anchor = drain, yshift = -1cm] (M5) at (M0.drain -| M3.drain) { };
+        \node[pmos, anchor = drain] (M6) at (M5.drain -| M4.drain) { };
+
+        % wires
+        \draw[wire] (Min1L.source) -- node[dot] (vtail1L) {} (Min1Lx.source);
+        \draw[wire] (Min2L.source) -- node[dot] (vtail2L) {} (Min2Lx.source);
+        \draw[wire] (Min1R.source) -- node[dot] (vtail1R) {} (Min1Rx.source);
+        \draw[wire] (Min2R.source) -- node[dot] (vtail2R) {} (Min2Rx.source);
+        \node[dot] at (M0.drain) {};
+        \draw[wire] (vtail1L) |- (inL);
+        \draw[wire] (vtail2L) |- (inL);
+        \draw[wire] (vtail1R) |- (inR);
+        \draw[wire] (vtail2R) |- (inR);
+        \draw[wire] (inL) |- (M0.drain);
+        \draw[wire] (inR) |- (M0.drain);
+        \node[dot] at (Mclk1Lx.drain) {};
+        \node[dot] at (Mclk2Lx.drain) {};
+        \node[dot] at (Mclk1Rx.drain) {};
+        \node[dot] at (Mclk2Rx.drain) {};
+        \draw[wire] (MdiodeL.gate) -- ++(0.3, 0) node[dot] (MdiodeLgateext) {} |- (MdiodeL.drain) node[dot] {};
+        \draw[wire] (MdiodeLgateext) -- node[above, voltagelabel] {$\voltagelabel{left}$} ++(0.8, 0);
+        \draw[wire] (MdiodeR.gate) -- ++(-0.3, 0) node[dot] (MdiodeRgateext) {} |- (MdiodeR.drain) node[dot] {};
+        \draw[wire] (MdiodeRgateext) -- node[above, voltagelabel] {$\voltagelabel{right}$} ++(-0.8, 0);
+        \draw[wire] (MdiodeL.drain) -- (sumL);
+        \draw[wire] (MdiodeR.drain) -- (sumR);
+        \draw[wire] (M5.gate) -- node[dot] (c2) { } (M6.gate);
+        \draw[wire] (c2) |- ($(M5.drain)+(0, -0.25)$) node[dot] {}; 
+
+        % power rails
+        \draw[wire] (M5.source) -- node[above, voltagelabel] {\qty{0.9}{\volt}} (M6.source);
+        \draw[wire] (MdiodeR.source) -- node[below, voltagelabel] {$\voltagelabel{ss}$} (MdiodeL.source);
+        \draw[wire] (M4.source) -- (MdiodeR.source);
+        \node[dot] at (MdiodeR.source) {};
+        \node[dot] at (M3.source) {};
+
+        % output current mirror connections
+        \draw[wire] (M3.drain) -- (M5.drain);
+        \draw[wire] (M4.drain) -- node[dot] (innerout) {} (M6.drain);
+        \draw[wire] (M5.gate) -- (M6.gate);
+        \draw[wire] (M3.gate) -- node[above, voltagelabel, pos = 0.8] {$\voltagelabel{left}$} ++(-0.5, 0);
+        \draw[wire] (M4.gate) -- node[above, voltagelabel, pos = 0.8] {$\voltagelabel{right}$} ++(-0.5, 0);
+
+        % output current port
+        \draw[wire] (M0.gate) -- ++(-0.4, 0) node[port, label = {[voltagelabel]left:$\voltagelabel{bias}$}] {};
+        \draw[wire, current arrow=0.7] (innerout) --  ++(0.5, 0) node[port, label = {[voltagelabel]above:$I_{\mathrm{out}}$}] {};
+
+        % input signals
+        \def\portxshift{0.4}
+        \def\portyshift{7pt}
+        \draw[wire] (Min1L.gate) -- ++( \portxshift, 0) pic[yshift = \portyshift]{trackhold1p}  node[port, label = {[voltagelabel, plotcolor1, xshift = -1pt, yshift=-1pt]right:$\voltagelabel{s1p}$}] {};
+        \draw[wire] (Min2L.gate) -- ++(-\portxshift, 0) pic[yshift = \portyshift]{trackhold2p}  node[port, label = {[voltagelabel, plotcolor4, xshift =  1pt, yshift=-1pt]left:$\voltagelabel{s2p}$ }] {};
+        \draw[wire] (Min1R.gate) -- ++(-\portxshift, 0) pic[yshift = \portyshift]{trackhold2n}  node[port, label = {[voltagelabel, plotcolor4, xshift =  1pt, yshift=-1pt]left:$\voltagelabel{s2n}$ }] {};
+        \draw[wire] (Min2R.gate) -- ++( \portxshift, 0) pic[yshift = \portyshift]{trackhold1n}  node[port, label = {[voltagelabel, plotcolor1, xshift = -1pt, yshift=-1pt]right:$\voltagelabel{s1n}$}] {};
+        \draw[wire] (Min1Lx.gate) -- ++( \portxshift, 0) pic[yshift = \portyshift]{trackhold1n} node[port, label = {[voltagelabel, plotcolor1, xshift = -1pt, yshift=-1pt]right:$\voltagelabel{s1n}$}] {};
+        \draw[wire] (Min2Lx.gate) -- ++(-\portxshift, 0) pic[yshift = \portyshift]{trackhold2n} node[port, label = {[voltagelabel, plotcolor4, xshift =  1pt, yshift=-1pt]left:$\voltagelabel{s2n}$ }] {};
+        \draw[wire] (Min1Rx.gate) -- ++(-\portxshift, 0) pic[yshift = \portyshift]{trackhold2p} node[port, label = {[voltagelabel, plotcolor4, xshift =  1pt, yshift=-1pt]left:$\voltagelabel{s2p}$ }] {};
+        \draw[wire] (Min2Rx.gate) -- ++( \portxshift, 0) pic[yshift = \portyshift]{trackhold1p} node[port, label = {[voltagelabel, plotcolor1, xshift = -1pt, yshift=-1pt]right:$\voltagelabel{s1p}$}] {};
+
+        % clock signals
+        \draw[wire] (Mclk1L.gate) -- ++( \portxshift, 0) pic[yshift = \portyshift]{clockp}      node[port, label = {[voltagelabel, plotcolor2, xshift = -1pt, yshift=-1pt]right:$\voltagelabel{cp}$}] {};
+        \draw[wire] (Mclk2L.gate) -- ++(-\portxshift, 0) pic[yshift = \portyshift]{clockn}      node[port, label = {[voltagelabel, plotcolor2, xshift =  1pt, yshift=-1pt]left:$\voltagelabel{cn}$ }] {};
+        \draw[wire] (Mclk1R.gate) -- ++(-\portxshift, 0) pic[yshift = \portyshift]{clockn}      node[port, label = {[voltagelabel, plotcolor2, xshift =  1pt, yshift=-1pt]left:$\voltagelabel{cn}$ }] {};
+        \draw[wire] (Mclk2R.gate) -- ++( \portxshift, 0) pic[yshift = \portyshift]{clockp}      node[port, label = {[voltagelabel, plotcolor2, xshift = -1pt, yshift=-1pt]right:$\voltagelabel{cp}$}] {};
+        \draw[wire] (Mclk1Lx.gate) -- ++( \portxshift, 0) pic[yshift = \portyshift]{clockoff}   node[port, label = {[voltagelabel,             xshift = -1pt, yshift=-1pt]right:$\voltagelabel{DD}$}] {};
+        \draw[wire] (Mclk2Lx.gate) -- ++(-\portxshift, 0) pic[yshift = \portyshift]{clockoff}   node[port, label = {[voltagelabel,             xshift =  1pt, yshift=-1pt]left:$\voltagelabel{DD}$ }] {};
+        \draw[wire] (Mclk1Rx.gate) -- ++(-\portxshift, 0) pic[yshift = \portyshift]{clockoff}   node[port, label = {[voltagelabel,             xshift =  1pt, yshift=-1pt]left:$\voltagelabel{DD}$ }] {};
+        \draw[wire] (Mclk2Rx.gate) -- ++( \portxshift, 0) pic[yshift = \portyshift]{clockoff}   node[port, label = {[voltagelabel,             xshift = -1pt, yshift=-1pt]right:$\voltagelabel{DD}$}] {};
+
+        % annotations
+        \node[above = 2pt, font = \small, inner sep = 0pt] (dummypathL) at ($(Min1Lx.source)!0.5!(Min2Lx.source)$) {Dummy Path};
+        \node[above = 2pt, font = \small, inner sep = 0pt] (dummypathR) at ($(Min1Rx.source)!0.5!(Min2Rx.source)$) {Dummy Path};
+        \node[fill = black, fill opacity = 0.1, fit = (Min1Lx.gate) (Min1Lx.source) (Mclk1Lx.drain) (Min2Lx.gate) (Min2Lx.source) (Mclk2Lx.drain) (dummypathL)] {};
+        \node[fill = black, fill opacity = 0.1, fit = (Min1Rx.gate) (Min1Rx.source) (Mclk1Rx.drain) (Min2Rx.gate) (Min2Rx.source) (Mclk2Rx.drain) (dummypathR)] {};
+    \end{tikzpicture}
+\end{document}

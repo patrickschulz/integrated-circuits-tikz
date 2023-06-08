@@ -1,0 +1,36 @@
+\tikzset{
+    circuits/ground/lines/.initial = 3,
+    circuits/ground/width/.initial = 0.15cm,
+    circuits/ground/height/.initial = 0.075cm,
+    circuits/ground/last width factor/.initial = 0.4,
+    ground/.style = {groundshape}
+}
+
+\pgfdeclareshape{groundshape}
+{
+    \savedmacro{\lines}{\edef\lines{\pgfkeysvalueof{/tikz/circuits/ground/lines}}}
+    \savedmacro{\lastwidthfactor}{\edef\lastwidthfactor{\pgfkeysvalueof{/tikz/circuits/ground/last width factor}}}
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/ground/width}}
+    \saveddimen{\height}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/ground/height}}
+    % general anchors
+    \anchor{center}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ 0.5 * \height}}}
+    \anchor{north}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ 0.5 * \height}}}
+    \anchor{south}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ 0.5 * \height}}}
+    \anchor{west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ 0.5 * \height}}}
+    \anchor{east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ 0.5 * \height}}}
+    \anchor{north west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ 0.5 * \height}}}
+    \anchor{north east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ 0.5 * \height}}}
+    \anchor{south west}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ 0.5 * \height}}}
+    \anchor{south east}{\pgfpointadd{\pgfpointorigin}{\pgfpoint{0cm}{ 0.5 * \height}}}
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \foreach \y in {1,2,...,\lines}
+        {
+            \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{ (1 - (1 - \lastwidthfactor) / (\lines - 1) * (\y - 1)) * \width}{0.5 * \height - \height / (\lines - 1) * (\y - 1)}}}
+            \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-(1 - (1 - \lastwidthfactor) / (\lines - 1) * (\y - 1)) * \width}{0.5 * \height - \height / (\lines - 1) * (\y - 1)}}}
+        }
+        \pgfusepath{stroke}
+    }
+}
+
+% vim: ft=plaintex nowrap

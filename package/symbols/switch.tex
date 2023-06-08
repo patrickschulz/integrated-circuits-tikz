@@ -1,0 +1,62 @@
+\newif\ifswitchopen
+
+\tikzset{
+    % switch
+    circuits/switch/open/.is if=switchopen,
+    circuits/switch/extension/.initial=0.15cm,
+    circuits/switch/length/.initial=0.3cm,
+    circuits/switch/circle radius/.initial=0.04cm,
+    circuits/switch/angle/.initial=30
+}
+
+\pgfdeclareshape{eswitch}
+{
+    \savedanchor{\center}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{sin(\pgfkeysvalueof{/tikz/circuits/switch/angle}) * \pgfkeysvalueof{/tikz/circuits/switch/length}}{0cm}}
+    }
+    \savedanchor{\plus}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{\pgfkeysvalueof{/tikz/circuits/switch/length} + \pgfkeysvalueof{/tikz/circuits/switch/extension}}{0cm}}
+    }
+    \savedanchor{\minus}{
+        \pgfpointadd{\pgfpointorigin}{\pgfpoint{-\pgfkeysvalueof{/tikz/circuits/switch/extension}}{0cm}}
+    }
+    \saveddimen{\length}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/switch/length}}
+    \saveddimen{\xfactor}{\pgfmathsetlength\pgf@x{cos(\pgfkeysvalueof{/tikz/circuits/switch/angle})}}
+    \saveddimen{\yfactor}{\pgfmathsetlength\pgf@x{sin(\pgfkeysvalueof{/tikz/circuits/switch/angle})}}
+    \saveddimen{\extension}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/switch/extension}}
+    \saveddimen{\radius}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/switch/circle radius}}
+
+    \anchor{center}{\center}
+    \anchor{plus}{\plus}
+    \anchor{minus}{\minus}
+    \anchor{left}{\center}
+    \anchor{right}{\center}
+    \anchor{east}{\plus}
+    \anchor{west}{\minus}
+    \anchor{north}{\center}
+    \anchor{south}{\center}
+    \anchor{north east}{\center}
+    \anchor{north west}{\center}
+    \anchor{south east}{\center}
+    \anchor{south west}{\center}
+
+    \beforebackgroundpath{
+        \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+
+        % draw switch body
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\extension}{0cm}}}
+        \pgfpathlineto{\pgfpointorigin}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{\xfactor * \length}{\yfactor * \length}}}
+        \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{\length + \pgfkeysvalueof{/tikz/circuits/line width}}{0cm}}}
+        \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{\length + \extension}{0cm}}}
+        \pgfusepath{stroke}
+
+        % draw switch circles
+        \pgfpathcircle{\pgfpointorigin}{\radius}
+        \pgfusepath{fill}
+        \pgfpathcircle{\pgfpointadd{\pgfpointorigin}{\pgfpoint{\length}{0cm}}}{\radius}
+        \pgfusepath{stroke}
+    }
+}
+
+% vim: ft=plaintex

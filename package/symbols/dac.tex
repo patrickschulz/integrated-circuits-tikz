@@ -1,0 +1,75 @@
+\tikzset{
+    circuits/dac/width/.initial = 0.75cm,
+    circuits/dac/height/.initial = 0.75cm,
+    circuits/dac/angle/.initial = 45, % currently not used
+    dac/.style = {draw, wire, dacshape}
+}
+
+\pgfdeclareshape{dacshape}
+{
+    \saveddimen{\width}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/dac/width}}
+    \saveddimen{\height}{\pgf@x=\pgfkeysvalueof{/tikz/circuits/dac/height}}
+    \savedanchor{\centerpoint}{\pgfpointorigin}
+    \savedanchor{\outputport}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {0.5 * \pgfkeysvalueof{/tikz/circuits/dac/width} + 0.25 * \pgfkeysvalueof{/tikz/circuits/dac/height}}%
+            {0cm}
+        }%
+    }
+    \savedanchor{\inputport}{%
+        \pgfpointadd%
+        {\pgfpointorigin}%
+        {\pgfpoint%
+            {-0.5 * \pgfkeysvalueof{/tikz/circuits/dac/width} - 0.25 * \pgfkeysvalueof{/tikz/circuits/dac/height}}%
+            {0cm}
+        }%
+    }
+    % electrical terminals (anchors)
+    \anchor{in}{\pgfpointadd{\centerpoint}{\pgfpoint{-0.5 * \width - 0.25 * \height}{0cm}}}
+    \anchor{out}{\outputport}
+    % regular anchors
+    \anchor{center}{\centerpoint}
+    \anchor{text} % this is used to center the text in the node
+    {
+        % the text node is shifted more than its width, a way of optical compensation (since the dac gets more narrow to the right)
+        \pgfpoint{-0.6\wd\pgfnodeparttextbox}{-0.5\ht\pgfnodeparttextbox}
+    }
+    \anchor{north}{
+        \pgfpointadd{\centerpoint}{\pgfpoint{0cm}{0.5 * \height}}
+    }
+    \anchor{south}{
+        \pgfpointadd{\centerpoint}{\pgfpoint{0cm}{-0.5 * \height}}
+    }
+    \anchor{east}{
+        \pgfpointadd{\centerpoint}{\pgfpoint{0.5 * \width + 0.25 * \height}{0cm}}
+    }
+    \anchor{west}{
+        \pgfpointadd{\centerpoint}{\pgfpoint{-0.5 * \width - 0.25 * \height}{0cm}}
+    }
+    \anchor{north west}{
+        \pgfpointadd{\centerpoint}{\pgfpoint{-0.5 * \width - 0.25 * \height}{0.5 * \height}}
+    }
+    \anchor{north east}{
+        \pgfpointadd{\centerpoint}{\pgfpoint{0.5 * \width + 0.25 * \height}{0.5 * \height}}
+    }
+    \anchor{south west}{
+        \pgfpointadd{\centerpoint}{\pgfpoint{-0.5 * \width - 0.25 * \height}{-0.5 * \height}}
+    }
+    \anchor{south east}{
+        \pgfpointadd{\centerpoint}{\pgfpoint{0.5 * \width + 0.25 * \height}{-0.5 * \height}}
+    }
+    \beforebackgroundpath{
+        %\pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
+        \pgfpathmoveto{\outputport}
+        \pgfpathlineto{\pgfpointadd{\outputport}{\pgfpoint{-0.5 * \height}{0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\outputport}{\pgfpoint{-0.5 * \height - \width}{0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\outputport}{\pgfpoint{-0.5 * \height - \width}{-0.5 * \height}}}
+        \pgfpathlineto{\pgfpointadd{\outputport}{\pgfpoint{-0.5 * \height}{-0.5 * \height}}}
+        \pgfpathclose
+        %\pgfusepath{stroke}
+    }
+}
+
+% vim: ft=plaintex nowrap
