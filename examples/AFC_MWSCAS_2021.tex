@@ -1,0 +1,67 @@
+\documentclass{standalone}
+
+\usepackage{../package/integrated-circuits-tikz}
+
+\usepackage{amsmath}
+
+\begin{document}
+    \begin{tikzpicture}
+        [
+            %on grid,
+            node distance = 0.5cm and 0.5cm,
+            %circuits/amplifier/width=0.5cm, 
+            %circuits/amplifier/height=0.5cm,
+            circuits/scale = 0.8,
+            every node/.append style = {font = \scriptsize},
+            wlabel/.style = {font = \scriptsize, inner xsep = 0pt},
+            module height = 0.75cm,
+            circuits/statemachine/port pitch/.initial = 0.40cm,
+        ]
+        \begin{scope}[module height = 0.75cm, module width = 0.5cm]
+            \node[module] (pfd) {PFD};
+            \node[module, right = 0.4cm of pfd] (cp) {CP};
+            \node[module, right = 0.4cm of cp] (dllfilter) {Filter};
+            \node[inner sep = 0pt, below = 0.2cm of cp] (dlllabel) {};
+            \node[module, right = 0.4cm of dllfilter] (delayline) {Delay\\Line};
+        \end{scope}
+        \draw[wire] (pfd) -- (cp);
+        \draw[wire] (cp) -- (dllfilter);
+        \draw[wire] (dllfilter) -- (delayline);
+        \draw[wire] (delayline.east) -| ++(0.2, 0.7) -| ($(pfd.west)+(-0.2, 0.2)$) -- ($(pfd.west)+(0, 0.2)$);
+        \draw[wire] ($(pfd.west)+(0, -0.2)$) -- ++(-0.5, 0) node[port, label = {[wlabel] above:ref}] {};
+        \node[rounded corners, draw, fill=black, fill opacity = 0.1, inner sep = 0.3cm, yshift = 0.1cm, fit = (pfd) (cp) (delayline) (dlllabel)] (dll) {};
+        \node[inner sep = 0pt, above = 0.1cm of dll.south] {DLL};
+        \coordinate[xshift = -0.5cm] (cdll) at (dll.south);
+        \node[module, below = of cdll] (selector) {Edge\\Selector};
+        \node[statemachine, circuits/statemachine/ports = 3, below left = 0.5cm and -0.2cm of selector, align = center] (statemachine) {State\\Machine};
+        \node[module, right = of selector] (sampler) {Sampler};
+        \node[comparator, circuits/comparator/draw input labels = false, right = 0.4cm of sampler] (comparator) {};
+        \node[register, above right = 0.6cm and 0.8cm of comparator, anchor = DIN, align = center] (reghigh) {High Shift\\Register};
+        \node[register, below right = 0.6cm and 0.8cm of comparator, anchor = DIN, align = center] (reglow) {Low Shift\\Register};
+        \node[andgate, below = 0.7cm of comparator] (regclkand) {};
+        \def\wspace{4pt}
+        \foreach \x in {-3.5, -2.5, ..., 3.5}
+        {
+            \draw[wire] ($(cdll)+({\x * \wspace}, 0)$) -- ($(selector.north)+({\x * \wspace}, 0)$);
+        }
+        \draw[wire] (statemachine.clk) -- node[pos = 1, anchor = south west, wlabel] {clk} ++(-0.5, 0);
+        \draw[wire] (statemachine.port 2) -- ++(-0.4, 0) node[port, label = {[wlabel, inner ysep = 1pt] above:lock}] (sport) {};
+        \draw[wire] (statemachine.reset) -- (statemachine.reset -| sport) node[port, label = {[wlabel, inner ysep = 1pt] above:reset}] {};
+        \draw[wire] (statemachine.east) -| (selector.south);
+        \draw[wire] (selector) -- node[above, wlabel] {clk} (sampler);
+        \draw[wire] (sampler.east) -- (comparator.cmin);
+        \draw[wire] (sampler.south) |- ++(-0.5, -0.5) node[port, label = {[wlabel] below:osc}] {};
+        \draw[wire] (comparator.+out) to[-|-] (reghigh.DIN);
+        \draw[wire] (comparator.-out) to[-|-] (reglow.DIN);
+        \node[module, anchor = west, xshift = -0.7cm] (decoder) at ($(reghigh.east)!0.5!(reglow.east)$) {Decoder};
+        \draw[wire] ($(reghigh.south)-(0.2, 0)$) |- ($(decoder.west)+(0, 0.2)$);
+        \draw[wire] ($(reglow.north)-(0.2, 0)$) |- ($(decoder.west)+(0, -0.2)$);
+        \draw[wire] (regclkand.in1) -- ++(-0.35, 0) node[wlabel, above] {clk};
+        \draw[wire] (regclkand.in2) -- node[pos = 0.5, wlabel, above] {EN} (statemachine.east |- regclkand.in2);
+        \draw[wire] (regclkand.out) -- ++(0.45, 0) coordinate (regclk);
+        \draw[wire] (regclk) |- node[dot] (rc0) {} (reglow.CLK);
+        \draw[wire] (rc0) |- (reghigh.CLK);
+        \draw[wire] (decoder.west) -- node[wlabel, anchor = south west, pos = 1] {$\overline{\text{EN}}$} ++(-0.7, 0);
+        \draw[wire, bit line] (decoder.east) -- node[below, font=\scriptsize] {4} ++(0.5, 0) node[port, label = {[wlabel, inner ysep = 1pt] above:freq}] {};
+    \end{tikzpicture}
+\end{document}

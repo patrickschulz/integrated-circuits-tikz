@@ -1,0 +1,96 @@
+\documentclass{standalone}
+
+\usepackage{../package/integrated-circuits-tikz}
+
+\usepackage{amsmath}
+
+\definecolor{paperred}{HTML}{C80000}
+
+\begin{document}
+    \begin{tikzpicture}
+        [
+            node distance = 0.5cm and 0.5cm,
+            plabel/.style = {font=\small},
+            circuits/mosfet/source length = 0.25cm,
+            circuits/mosfet/drain length = 0.25cm,
+            %circuits/mosfet/channel length = 0.4cm,
+            %circuits/mosfet/channel height = 0.25cm,
+            %circuits/mosfet/gate width = 0.4cm,
+            %circuits/mosfet/arrow length/.initial = 1.25mm,
+            %circuits/mosfet/arrow width/.initial = 1.25mm
+        ]
+        \coordinate (origin);
+        % clock nMOS
+        \node[nmos, left = 2.2cm of origin]  (Nclock1) {};
+        \node[nmos, right = 2.2cm of origin] (Nclock2) {};
+        \draw[wire] (Nclock1.gate) -- ++(-0.5, 0) node[port, label = {[plabel] above:clk}] {};
+        \draw[wire] (Nclock2.gate) -- ++(-0.5, 0) node[port, label = {[plabel] above:clk}] {};
+        % input nMOS
+        \node[nmos, above left  = 0.0cm and 0.8cm of Nclock1.drain, anchor = source]            (Nin1) {};
+        \node[nmos, above right = 0.0cm and 0.8cm of Nclock1.drain, xmirror, anchor = source] (Nin2) {};
+        \node[nmos, above left  = 0.0cm and 0.8cm of Nclock2.drain, anchor = source]            (Nin3) {};
+        \node[nmos, above right = 0.0cm and 0.8cm of Nclock2.drain, xmirror, anchor = source] (Nin4) {};
+        \node[paperred, plabel] at (Nin1.text) {$\times2$};
+        \node[paperred, plabel] at (Nin2.text) {$\times1$};
+        \node[paperred, plabel] at (Nin3.text) {$\times2$};
+        \node[paperred, plabel] at (Nin4.text) {$\times1$};
+        \draw[wire] (Nin1.gate) -- ++(-0.5, 0) node[port, label = {[plabel] below:in1p}] {};
+        \draw[wire] (Nin2.gate) -- ++( 0.5, 0) node[port, label = {[plabel] below:in2p}] {};
+        \draw[wire] (Nin3.gate) -- ++(-0.5, 0) node[port, label = {[plabel] below:in2n}] {};
+        \draw[wire] (Nin4.gate) -- ++( 0.5, 0) node[port, label = {[plabel] below:in1n}] {};
+        \draw[wire] (Nin1.source) -- node[dot] (cll) {} (Nin2.source);
+        \draw[wire] (Nin3.source) -- node[dot] (clr) {} (Nin4.source);
+        \draw[wire] (Nclock1.drain) -- (cll);
+        \draw[wire] (Nclock2.drain) -- (clr);
+        \node[dot, yshift = 0.3cm] at (Nin1.drain -| cll) (cul) {};
+        \node[dot, yshift = 0.3cm] at (Nin4.drain -| clr) (cur) {};
+        \draw[wire] (Nin1.drain) |- (cul);
+        \draw[wire] (Nin3.drain) to[angleconnect = -1.15cm and -1.55cm] (cul);
+        \draw[wire] (Nin4.drain) |- (cur);
+        \draw[wire] (Nin2.drain) to[angleconnect = 1.15cm and 1.55cm] (cur);
+        % feedback inverter pMOS
+        \node[pmos, above = 0.0cm of cul, anchor = drain, xmirror] (Pinvll) {};
+        \node[pmos, above = 0.0cm of cur, anchor = drain] (Pinvlr) {};
+        \node[pmos, above = 0.4cm of Pinvll.source, anchor = drain, xmirror] (Pinvul) {};
+        \node[pmos, above = 0.4cm of Pinvlr.source, anchor = drain] (Pinvur) {};
+        \draw[wire] (cul) -- (Pinvll.drain);
+        \draw[wire] (cur) -- (Pinvlr.drain);
+        \draw[wire] (Pinvll.source) -- node[dot, pos = 0.3] (invll) {} node[dot, pos = 0.7] (invul) {} (Pinvul.drain);
+        \draw[wire] (Pinvlr.source) -- node[dot, pos = 0.3] (invlr) {} node[dot, pos = 0.7] (invur) {} (Pinvur.drain);
+        \draw[wire] (Pinvll.gate) to[angleconnect =  1.2cm and  1.55cm] (invlr);
+        \draw[wire] (Pinvul.gate) to[angleconnect =  1.2cm and  1.55cm] (invur);
+        \draw[wire] (Pinvlr.gate) to[angleconnect = -1.2cm and -1.55cm] (invll);
+        \draw[wire] (Pinvur.gate) to[angleconnect = -1.2cm and -1.55cm] (invul);
+        % clock pMOS
+        \node[pmos, left = 0.75cm of Pinvul.drain, anchor = drain] (Pclk1l) {};
+        \node[pmos, left = 0.5cm of Pclk1l.gate, anchor = gate, xmirror] (Pclk2l) {};
+        \node[pmos, right = 0.75cm of Pinvur.drain, anchor = drain, xmirror] (Pclk1r) {};
+        \node[pmos, right = 0.5cm of Pclk1r.gate, anchor = gate] (Pclk2r) {};
+        \draw[wire] (Pclk1l.drain) |- (invul);
+        \draw[wire] (Pclk2l.drain) |- (Nin1.drain |- cul) node[dot] {};
+        \draw[wire] (Pclk1r.drain) |- (invur);
+        \draw[wire] (Pclk2r.drain) |- (Nin4.drain |- cur) node[dot] {};
+        \draw[wire] (Pclk1l.gate) -- node[dot] (clkl) {} (Pclk2l.gate);
+        \draw[wire] (clkl) -- ++(0, -0.5) node[port, label = {[plabel] below:clk}] {};
+        \draw[wire] (Pclk1r.gate) -- node[dot] (clkr) {} (Pclk2r.gate);
+        \draw[wire] (clkr) -- ++(0, -0.5) node[port, label = {[plabel] below:clk}] {};
+        % power rails
+        \coordinate (vdd) at ($(Pinvul.source -| Pclk2l.source)+(-0.5, 0.0)$);
+        \coordinate (vss) at ($(vdd |- Nclock1.source)+(0, -0.0)$);
+        \draw[wire] (Pclk1l.source) |- (Pclk1l.source |- vdd) node[dot] {};
+        \draw[wire] (Pclk2l.source) |- (Pclk2l.source |- vdd) node[dot] {};
+        \draw[wire] (Pinvul.source) |- (Pinvul.source |- vdd) node[dot] {};
+        \draw[wire] (Pinvur.source) |- (Pinvur.source |- vdd) node[dot] {};
+        \draw[wire] (Pclk1r.source) |- (Pclk1r.source |- vdd) node[dot] {};
+        \draw[wire] (Pclk2r.source) |- (vdd);
+        \draw[wire] (Nclock1.source) |- (vss -| Nclock1.source) node[dot] {};
+        \draw[wire] (Nclock2.source) |- (vss);
+        \node[plabel, below] at (vdd) {VDD};
+        \node[plabel, above] at (vss) {VSS};
+        % outputs
+        \draw[wire] (invll) -- ++(-0.5, 0) node[port, label = {[plabel] below:outp}] {};
+        \draw[wire] (invlr) -- ++( 0.5, 0) node[port, label = {[plabel] below:outn}] {};
+        %% draw boxes
+        %%\scoped[on background layer] \node[fill=black!10, inner ysep=0pt, fit = (Nclock1) (Nin1) (Nin2)] {};
+    \end{tikzpicture}
+\end{document}
