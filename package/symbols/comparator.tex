@@ -116,14 +116,15 @@
     \anchor{south east}{
         \pgfpointadd{\circuits@comparator@inputminus}{\pgfpoint{\circuits@comparator@width}{-0.5 * \circuits@comparator@inputheight * (1 - \circuits@comparator@inputdistribution)}}
     }
-    \backgroundpath{
+    \beforebackgroundpath{
+        % outline
         \pgfsetlinewidth{\pgfkeysvalueof{/tikz/circuits/line width}}
         \pgfpathmoveto{\pgfpointadd{\circuits@comparator@inputplus}{\pgfpoint{0cm}{0.5 * \circuits@comparator@inputheight * (1 - \circuits@comparator@inputdistribution)}}}
         \pgfpathlineto{\circuits@comparator@output}
         \pgfpathlineto{\pgfpointadd{\circuits@comparator@inputminus}{\pgfpoint{0cm}{-0.5 * \circuits@comparator@inputheight * (1 - \circuits@comparator@inputdistribution)}}}
-        \pgfpathclose
-    }
-    \beforebackgroundpath{
+        \pgfclosepath
+        \pgfusepath{stroke}
+
         \pgfpathmoveto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-\circuits@comparator@anno@width}{-0.5 * \circuits@comparator@anno@height}}}
         \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \circuits@comparator@anno@width}{-0.5 * \circuits@comparator@anno@height}}}
         \pgfpathlineto{\pgfpointadd{\pgfpointorigin}{\pgfpoint{-0.5 * \circuits@comparator@anno@width}{0.5 * \circuits@comparator@anno@height}}}

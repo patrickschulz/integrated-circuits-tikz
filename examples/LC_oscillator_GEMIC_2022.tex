@@ -1,6 +1,6 @@
 \documentclass{standalone}
 
-\usepackage{../package/integrated-circuits-tikz}
+\usepackage{package/integrated-circuits-tikz}
 
 \usepackage{siunitx}
 
@@ -98,7 +98,7 @@
         %**************
         % resonator
         \coordinate[right = 3.5cm of vcoorigin] (resonatorinfo);
-        \node (resonator) at (resonatorinfo) {\includegraphics[width=2.5cm]{LC_oscillator_GEMIC_2022_resonator_bw}};
+        \node (resonator) at (resonatorinfo) {\includegraphics[width=2.5cm]{examples/LC_oscillator_GEMIC_2022_resonator_bw}};
         \begin{scope}[on background layer]
             \draw[rounded corners, fill = annotationgray] ($(resonatorinfo)-(1.8, 0.8)$) rectangle ($(resonatorinfo)+(1.8, 0.8)$);
         \end{scope}

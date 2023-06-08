@@ -1,0 +1,95 @@
+\documentclass{standalone}
+
+\usepackage{package/integrated-circuits-tikz}
+
+\usepackage{amsmath}
+
+\tikzset {
+    line/.style={semithick},
+    tip/.style args = {#1 and #2}{
+        line,
+        ->,
+        >=stealth,
+        shorten >= #1,
+        shorten <= #2
+    },
+    tip/.default = {0pt and 0pt},
+    bitip/.style args = {#1 and #2}{
+        line,
+        <->,
+        >=stealth,
+        shorten >= #1,
+        shorten <= #2
+    },
+    bitip/.default = {0pt and 0pt},
+    rtip/.style = {
+        line,
+        <-,
+        >=stealth
+    },
+}
+
+\begin{document}
+    \begin{tikzpicture}
+        [
+            on grid,
+            circuits/amplifier/width=0.45cm, 
+            circuits/amplifier/height=0.45cm,
+            anno/.style = {inner xsep = 0pt, inner ysep = 2pt, font=\scriptsize}
+        ]
+        % main circuit
+        \node[port, label = {[anno] below:vin}] (vin) {};
+        \node[amplifier, right = of vin] (amp) {};
+        \node[eswitch, rotate = -90, ymirror, below right = 0.8cm and 0.5cm of amp] (S1) {};
+        \node[eswitch, rotate = -90, right = 0.8cm of S1] (S2) {};
+        \node[capacitor, rotate = 90, below = 0.8cm of S1] (C1) {};
+        \node[capacitor, rotate = 90, below = 0.8cm of S2] (C2) {};
+        \node[ground, below = 0.5cm of C1] (gnd1) {};
+        \node[ground, below = 0.5cm of C2] (gnd2) {};
+        \node[comparator, above right = 0.4cm and 2cm of C2] (comp) {};
+        \node[dflipflop, circuits/dflipflop/draw NQ = true, right = 0.5cm of comp.out, anchor = D, font = \scriptsize] (dff) {DFF};
+        \node[andgate, right = 1.13cm of dff.Q, anchor = in2] (and) {};
+        \node[nandgate, right = 1cm of dff.NQ, anchor = in1] (nand) {};
+        \node[notgate, right = of nand.out, anchor = in] (not) {};
+        \node[counter, circuits/sequential logic/draw reset = true, right = 1.2cm of and.out, anchor = count, font = \scriptsize, align = center] (counter) {Saturating\\Counter};
+        \node[dflipflop, circuits/dflipflop/draw NQ = true, right = 2cm of not.out, anchor = CLK, font = \scriptsize] (tff) {TFF};
+        % store signals
+        \node[module, module height = 0.5cm, module width = 0.5cm, below left = 1.2cm and -0.4cm of C1, font = \scriptsize] (pulser) {Pulser};
+        \node[andgate, below = 1cm of pulser] (sand1) {};
+        \node[andgate, below = 1cm of sand1] (sand2) {};
+        % wires
+        \draw[wire] (vin) -- (amp.in);
+        \draw[wire] (amp.out) -| node[dot] (c0) {} (S1.minus);
+        \draw[wire] (c0) -| (S2.minus);
+        \draw[wire] (S1.plus) -- (C1.plus);
+        \draw[wire] (S2.plus) -- (C2.plus);
+        \draw[rtip, wire] ($(S1.south)+(-0.1, 0)$) -- node[anno, above] {store1} ++(-1, 0);
+        \draw[rtip, wire] ($(S2.north)+(0.1, 0)$) -- node[anno, above] {store2} ++(1, 0);
+        \draw[wire] (C1.minus) -- (gnd1.north);
+        \draw[wire] (C2.minus) -- (gnd2.north);
+        \draw[wire] (comp.+in) -- (comp.+in -| C1.plus) node[dot] {};
+        \draw[wire] (comp.-in) -- (comp.-in -| C2.plus) node[dot] {};
+        \draw[wire] (comp.out) to[-|-] (dff.D);
+        \draw[wire] (dff.Q) to[-|-] (and.in2);
+        \node[anno, xshift = 0.5cm] at ($(dff.Q)!0.5!(dff.NQ)$) {equal};
+        \draw[wire] (dff.NQ) to[-|-] (nand.in1);
+        \draw[wire] (and.in1) -- node[pos = 1, anno, above] {\textasciitilde{}compare} ++(-0.6, 0);
+        \draw[wire] (nand.in2) -- node[pos = 1, anno, above] {\textasciitilde{}compare} ++(-0.6, 0);
+        \draw[wire] (and.out) -- (counter.count);
+        \draw[wire] (nand.out) -- node[dot, pos = 0.2] (c0) {} (not.in);
+        \draw[wire] (c0) |- node[below, anno, pos = 0.75] {reset} (counter.reset);
+        \draw[wire] (not.out) -- (tff.CLK);
+        \draw[wire] (tff.Q) -- node[pos = 1, anno, anchor = south east] {select} ++(1, 0) coordinate (s0);
+        \draw[wire] (tff.NQ) -- node[pos = 1, anno, anchor = north east] {\textasciitilde{}select} (tff.NQ -| s0);
+        \draw[wire] (sand1.in1) -- node[pos = 0.2, anno, anchor = south east] {store} ++(-0.75, 0);
+        \draw[wire] (sand2.in1) -- node[pos = 0.2, anno, anchor = south east] {store} ++(-0.75, 0);
+        \draw[wire] (sand1.in2) -- node[pos = 0.2, anno, anchor = south east] {select} ++(-0.75, 0);
+        \draw[wire] (sand2.in2) -- node[pos = 0.2, anno, anchor = south east] {\textasciitilde{}select} ++(-0.75, 0);
+        \draw[wire] (sand1.out) -- node[above, anno] {store1} ++(0.75, 0);
+        \draw[wire] (sand2.out) -- node[above, anno] {store2} ++(0.75, 0);
+        \draw[wire] (counter.Q) -- ++(0.5, 0) node[port, label = {[anno] lock}] {};
+        \draw[wire] (pulser.west) -- ++(-0.5, 0) node[port, label = {[anno] above:ref}] {};
+        %\draw[wire] (pulser.east) -- ++(0.75, 0) node[above, anno] {compare};
+        \draw[wire] (pulser.east) -- node[above, anno] {compare} ++(2, 0) |- (dff.CLK);
+    \end{tikzpicture}
+\end{document}
